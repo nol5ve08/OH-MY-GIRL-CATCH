@@ -10,7 +10,7 @@ const wss = new WebSocket.Server({ server });
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Game Config ──
-const TICK_RATE = 20; // server ticks per second
+const TICK_RATE = 60; // server ticks per second
 const MAX_PLAYERS = 8;
 const CATCH_DIST = 18;
 const MAP_W = 900, MAP_H = 580;
