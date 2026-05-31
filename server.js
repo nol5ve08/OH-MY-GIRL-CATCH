@@ -223,10 +223,15 @@ class Room {
 
     if (data.angle !== undefined) p.angle = data.angle;
 
-    const nx = p.x + dx;
-    const ny = p.y + dy;
-    if (canMove(nx, p.y, p.radius)) p.x = nx;
-    if (canMove(p.x, ny, p.radius)) p.y = ny;
+    const steps = Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)));
+
+for (let i = 0; i < steps; i++) {
+  const stepX = dx / steps;
+  const stepY = dy / steps;
+
+  if (canMove(p.x + stepX, p.y, p.radius)) p.x += stepX;
+  if (canMove(p.x, p.y + stepY, p.radius)) p.y += stepY;
+}
   }
 
   getPlayersState() {
