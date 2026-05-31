@@ -196,7 +196,7 @@ class Room {
     if (!p || this.state !== 'playing') return;
     if (p.caught && !p.isSeeker) return;
 
-    const speed = p.isSeeker ? 3 : 1.5;
+    const speed = p.isSeeker ? 8 : 5.5;
     let dx = 0, dy = 0;
 
     if (data.moveX !== undefined && data.moveY !== undefined) {
