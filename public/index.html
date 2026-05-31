@@ -192,10 +192,6 @@ function connect(){
           if(diff>50){
             // Too far off, snap
             localX=serverMe.x;localY=serverMe.y;
-          }else if(diff>2){
-            // Gentle correction
-            localX+=dx*0.05;
-            localY+=dy*0.05;
           }
           // Always sync angle from server for others to see correctly
           // localAngle+=(serverMe.angle-localAngle)*0.3;
