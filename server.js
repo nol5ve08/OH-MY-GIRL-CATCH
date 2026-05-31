@@ -135,6 +135,7 @@ class Room {
     for (const [id, p] of this.players) {
       this.sendTo(id, {
         type: 'game_start',
+        yourId: id,
         seekerId: this.seekerId,
         isSeeker: p.isSeeker,
         players: this.getPlayersState(),
@@ -311,7 +312,7 @@ wss.on('connection', (ws) => {
           const room = new Room(id, String(data.title).slice(0, 20), data.password, pid);
           rooms.set(id, room);
           room.addPlayer(ws, ws._name, data.charIdx || 0);
-          ws.send(JSON.stringify({ type: 'room_joined', roomId: id, isHost: true }));
+          ws.send(JSON.stringify({ type: 'room_joined', roomId: id, isHost: true, yourId: pid }));
           break;
         }
 
@@ -322,7 +323,7 @@ wss.on('connection', (ws) => {
           if (room.players.size >= MAX_PLAYERS) { ws.send(JSON.stringify({ type: 'error', msg: '방이 가득 찼어요' })); break; }
           if (room.password && data.password !== room.password) { ws.send(JSON.stringify({ type: 'error', msg: '비밀번호가 틀렸어요' })); break; }
           room.addPlayer(ws, ws._name, data.charIdx || 0);
-          ws.send(JSON.stringify({ type: 'room_joined', roomId: room.id, isHost: room.hostId === pid }));
+          ws.send(JSON.stringify({ type: 'room_joined', roomId: room.id, isHost: room.hostId === pid, yourId: pid }));
           break;
         }
 
