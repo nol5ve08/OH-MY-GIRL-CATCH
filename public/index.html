@@ -198,7 +198,7 @@ function connect(){
             localY+=dy*0.05;
           }
           // Always sync angle from server for others to see correctly
-          localAngle+=(serverMe.angle-localAngle)*0.3;
+          // localAngle+=(serverMe.angle-localAngle)*0.3;
         }
         break;
       case 'game_end': gameActive=false; showToast(d.reason); showScreen('waitingScreen'); isReady=false; break;
