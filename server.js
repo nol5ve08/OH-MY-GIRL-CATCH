@@ -78,7 +78,7 @@ class Room {
       ready: false,
       x: 0, y: 0, angle: 0,
       isSeeker: false, caught: false,
-      radius: 6
+      radius: 4
     });
     ws._roomId = this.id;
     this.broadcastLobby();
@@ -121,7 +121,7 @@ class Room {
     for (const [id, p] of this.players) {
       p.isSeeker = (id === this.seekerId);
       p.caught = false;
-      p.radius = p.isSeeker ? 8 : 6;
+      p.radius = p.isSeeker ? 6 : 4;
       const sp = spawns[si % spawns.length];
       p.x = sp.x;
       p.y = sp.y;
