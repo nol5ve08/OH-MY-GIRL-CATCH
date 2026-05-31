@@ -362,13 +362,24 @@ function sendInput(){
   const me=gamePlayers.find(p=>p.id===myId);if(!me)return;
   if(me.caught&&!me.isSeeker)return;
   
-  let angle=0;
-  if(joy.left.active)angle=joy.left.angle;
-  else angle=Math.atan2(mouse.y-(predictionActive?localY:me.y),mouse.x-(predictionActive?localX:me.x));
-  
-  let mx=0,my=0;
-  if(joy.right.active){mx=Math.cos(joy.right.angle)*joy.right.dist;my=Math.sin(joy.right.angle)*joy.right.dist}
-  else{if(keys.w||keys.arrowup)my=-1;if(keys.s||keys.arrowdown)my=1;if(keys.a||keys.arrowleft)mx=-1;if(keys.d||keys.arrowright)mx=1;if(mx&&my){mx*=.707;my*=.707}}
+let mx=0,my=0;
+
+if(joy.right.active){
+  mx=Math.cos(joy.right.angle)*joy.right.dist;
+  my=Math.sin(joy.right.angle)*joy.right.dist;
+}else{
+  if(keys.w||keys.arrowup)my=-1;
+  if(keys.s||keys.arrowdown)my=1;
+  if(keys.a||keys.arrowleft)mx=-1;
+  if(keys.d||keys.arrowright)mx=1;
+  if(mx&&my){mx*=.707;my*=.707}
+}
+
+let angle = localAngle;
+
+if (mx !== 0 || my !== 0) {
+  angle = Math.atan2(my, mx);
+}
   
   const dash=keys[' ']&&isSeeker&&dashCd<=0;
   send({type:'input',moveX:mx,moveY:my,angle,dash});
