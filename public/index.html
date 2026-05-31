@@ -184,13 +184,21 @@ function connect(){
       case 'game_start': startGame(d); break;
       case 'game_state':
         gamePlayers=d.players;elapsed=d.elapsed;
-        // Sync local prediction with server (smooth correction)
+        // Smooth sync - only correct if difference is significant
         const serverMe=d.players.find(p=>p.id===myId);
-        if(serverMe&&predictionActive){
-          localX+=(serverMe.x-localX)*0.3;
-          localY+=(serverMe.y-localY)*0.3;
-        }else if(serverMe){
-          localX=serverMe.x;localY=serverMe.y;localAngle=serverMe.angle;
+        if(serverMe){
+          const dx=serverMe.x-localX,dy=serverMe.y-localY;
+          const diff=Math.sqrt(dx*dx+dy*dy);
+          if(diff>50){
+            // Too far off, snap
+            localX=serverMe.x;localY=serverMe.y;
+          }else if(diff>2){
+            // Gentle correction
+            localX+=dx*0.15;
+            localY+=dy*0.15;
+          }
+          // Always sync angle from server for others to see correctly
+          localAngle+=(serverMe.angle-localAngle)*0.3;
         }
         break;
       case 'game_end': gameActive=false; showToast(d.reason); showScreen('waitingScreen'); isReady=false; break;
@@ -390,7 +398,7 @@ function drawGame(){
   ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
   
   // Raycast cone for me
-  const rays=80,pts=[{x:myX,y:myY}];
+  const rays=40,pts=[{x:myX,y:myY}];
   for(let i=0;i<=rays;i++){const a=myAngle-FOV+(FOV*2*i/rays);const d=castRay(myX,myY,a,VIEW_DIST);pts.push({x:myX+Math.cos(a)*d,y:myY+Math.sin(a)*d})}
   
   // Clip cone
@@ -400,9 +408,6 @@ function drawGame(){
   
   // Scene
   ctx.fillStyle='#2a2a2a';ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(255,255,255,.03)';ctx.lineWidth=1;
-  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
-  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
   drawWalls(1);
   
   // Other players in cone
@@ -436,8 +441,6 @@ function drawGame(){
   const col=characters[me.charIdx]?.color||'#fff';
   ctx.fillStyle=col;ctx.beginPath();ctx.arc(myX,myY,me.radius||6,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='rgba(255,255,255,.6)';ctx.beginPath();ctx.arc(myX+Math.cos(myAngle)*6,myY+Math.sin(myAngle)*6,3,0,Math.PI*2);ctx.fill();
-  // Ambient
-  ctx.save();ctx.globalCompositeOperation='lighter';const ag=ctx.createRadialGradient(myX,myY,0,myX,myY,30);ag.addColorStop(0,'rgba(40,40,40,.4)');ag.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=ag;ctx.fillRect(myX-30,myY-30,60,60);ctx.restore();
   
   // HUD
   const hud=document.getElementById('gameHudText');
@@ -459,9 +462,8 @@ function drawGame(){
 
 function drawWalls(a){
   for(const w of gameWalls){
-    if(w.w<=5||w.h<=5){ctx.fillStyle=`rgba(120,120,120,${a*.6})`;ctx.fillRect(w.x,w.y,w.w,w.h)}
-    else{ctx.fillStyle=`rgba(150,150,150,${a*.7})`;ctx.fillRect(w.x,w.y,w.w,w.h);ctx.fillStyle=`rgba(180,180,180,${a*.3})`;ctx.fillRect(w.x,w.y,w.w,3)}
-    ctx.strokeStyle=`rgba(100,100,100,${a*.4})`;ctx.lineWidth=1;ctx.strokeRect(w.x,w.y,w.w,w.h);
+    ctx.fillStyle=`rgba(140,140,140,${a*.7})`;
+    ctx.fillRect(w.x,w.y,w.w,w.h);
   }
 }
 
