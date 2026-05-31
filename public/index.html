@@ -179,10 +179,20 @@ function connect(){
     const d=JSON.parse(e.data);
     switch(d.type){
       case 'room_list': renderRoomList(d.rooms); break;
-      case 'room_joined': currentRoomId=d.roomId; isHost=d.isHost; showScreen('waitingScreen'); break;
+      case 'room_joined': currentRoomId=d.roomId; isHost=d.isHost; myId=d.yourId; showScreen('waitingScreen'); break;
       case 'room_update': updateWaitingRoom(d); break;
       case 'game_start': startGame(d); break;
-      case 'game_state': gamePlayers=d.players; elapsed=d.elapsed; break;
+      case 'game_state':
+        gamePlayers=d.players;elapsed=d.elapsed;
+        // Sync local prediction with server (smooth correction)
+        const serverMe=d.players.find(p=>p.id===myId);
+        if(serverMe&&predictionActive){
+          localX+=(serverMe.x-localX)*0.3;
+          localY+=(serverMe.y-localY)*0.3;
+        }else if(serverMe){
+          localX=serverMe.x;localY=serverMe.y;localAngle=serverMe.angle;
+        }
+        break;
       case 'game_end': gameActive=false; showToast(d.reason); showScreen('waitingScreen'); isReady=false; break;
       case 'player_caught': showToast('잡혔다!'); break;
       case 'dash_cd': dashCd=d.cd; break;
@@ -254,15 +264,9 @@ document.getElementById('createModal').onclick=e=>{if(e.target.id==='createModal
 // ═══ WAITING ROOM ═══
 function updateWaitingRoom(d){
   const r=d.room, pl=d.players;
-  isHost=(r.hostId===myId)||(pl.length>0&&pl[0].id&&d.room.hostId);
-  // Find my id from players
-  // Server sends player list, find self
   document.getElementById('waitingRoomInfo').textContent=r.id+' '+r.title;
   document.getElementById('waitingRoomMeta').innerHTML=`<span>${pl.length} / 8</span>`;
   
-  // Detect if I'm host
-  const myPlayer=pl.find(p=>p.name===myName);
-  if(myPlayer)myId=myPlayer.id;
   isHost=(r.hostId===myId);
   
   if(isHost){document.getElementById('startBtn').style.display='';document.getElementById('readyBtn').style.display='none';
@@ -309,8 +313,9 @@ canvas.width=W;canvas.height=H;
 const keys={};
 const mouse={x:W/2,y:H/2};
 const gk=['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '];
-window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();keys[k]=true;if(gk.includes(k))e.preventDefault()});
-window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+const korMap={'ㅈ':'w','ㅁ':'a','ㄴ':'s','ㅇ':'d'};
+window.addEventListener('keydown',e=>{let k=e.key.toLowerCase();if(korMap[k])k=korMap[k];keys[k]=true;if(gk.includes(k))e.preventDefault()});
+window.addEventListener('keyup',e=>{let k=e.key.toLowerCase();if(korMap[k])k=korMap[k];keys[k]=false});
 canvas.addEventListener('mousemove',e=>{const r=canvas.getBoundingClientRect();mouse.x=(e.clientX-r.left)*(W/r.width);mouse.y=(e.clientY-r.top)*(H/r.height)});
 
 // Joystick
@@ -330,12 +335,19 @@ function castRay(ox,oy,a,md){const s=3;let d=0;while(d<md){d+=s;const px=ox+Math
 function isVis(sx,sy,sa,px,py){const dx=px-sx,dy=py-sy,d=Math.sqrt(dx*dx+dy*dy);if(d>VIEW_DIST)return false;let ad=Math.atan2(dy,dx)-sa;while(ad>Math.PI)ad-=Math.PI*2;while(ad<-Math.PI)ad+=Math.PI*2;if(Math.abs(ad)>FOV)return false;return castRay(sx,sy,Math.atan2(dy,dx),d)>=d-5}
 
 function startGame(d){
-  seekerId=d.seekerId;isSeeker=d.isSeeker;gamePlayers=d.players;gameWalls=d.walls;dashCd=0;gameActive=true;
+  myId=d.yourId;seekerId=d.seekerId;isSeeker=d.isSeeker;gamePlayers=d.players;gameWalls=d.walls;dashCd=0;gameActive=true;
+  // Init local prediction
+  const me=d.players.find(p=>p.id===myId);
+  if(me){localX=me.x;localY=me.y;localAngle=me.angle}
+  predictionActive=false;
   showScreen('gameScreen');canvas.focus();
   canvas.style.width=Math.min(900,window.innerWidth)+'px';
   canvas.style.height=Math.min(580,window.innerHeight-40)+'px';
   requestAnimationFrame(gameLoop);
 }
+
+// Client-side prediction
+let localX=0,localY=0,localAngle=0,predictionActive=false;
 
 function sendInput(){
   if(!gameActive)return;
@@ -344,7 +356,7 @@ function sendInput(){
   
   let angle=0;
   if(joy.left.active)angle=joy.left.angle;
-  else angle=Math.atan2(mouse.y-me.y,mouse.x-me.x);
+  else angle=Math.atan2(mouse.y-(predictionActive?localY:me.y),mouse.x-(predictionActive?localX:me.x));
   
   let mx=0,my=0;
   if(joy.right.active){mx=Math.cos(joy.right.angle)*joy.right.dist;my=Math.sin(joy.right.angle)*joy.right.dist}
@@ -353,19 +365,33 @@ function sendInput(){
   const dash=keys[' ']&&isSeeker&&dashCd<=0;
   send({type:'input',moveX:mx,moveY:my,angle,dash});
   if(dashCd>0)dashCd--;
+
+  // Local prediction
+  const speed=me.isSeeker?3:1.5;
+  const nx=localX+mx*speed;
+  const ny=localY+my*speed;
+  // Simple bounds check
+  if(nx>8&&nx<W-8)localX=nx;
+  if(ny>8&&ny<H-8)localY=ny;
+  localAngle=angle;
+  predictionActive=true;
 }
 
 function drawGame(){
   ctx.clearRect(0,0,W,H);
   const me=gamePlayers.find(p=>p.id===myId);
   if(!me){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);return}
+  // Use local prediction for my position
+  const myX=predictionActive?localX:me.x;
+  const myY=predictionActive?localY:me.y;
+  const myAngle=predictionActive?localAngle:me.angle;
 
   // Black bg
   ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
   
   // Raycast cone for me
-  const rays=80,pts=[{x:me.x,y:me.y}];
-  for(let i=0;i<=rays;i++){const a=me.angle-FOV+(FOV*2*i/rays);const d=castRay(me.x,me.y,a,VIEW_DIST);pts.push({x:me.x+Math.cos(a)*d,y:me.y+Math.sin(a)*d})}
+  const rays=80,pts=[{x:myX,y:myY}];
+  for(let i=0;i<=rays;i++){const a=myAngle-FOV+(FOV*2*i/rays);const d=castRay(myX,myY,a,VIEW_DIST);pts.push({x:myX+Math.cos(a)*d,y:myY+Math.sin(a)*d})}
   
   // Clip cone
   ctx.save();ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
@@ -383,7 +409,7 @@ function drawGame(){
   for(const p of gamePlayers){
     if(p.id===myId)continue;
     if(p.caught&&!p.isSeeker)continue;
-    if(isVis(me.x,me.y,me.angle,p.x,p.y)){
+    if(isVis(myX,myY,myAngle,p.x,p.y)){
       ctx.fillStyle=characters[p.charIdx]?.color||'#888';
       ctx.beginPath();ctx.arc(p.x,p.y,p.radius||6,0,Math.PI*2);ctx.fill();
       ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.arc(p.x,p.y,(p.radius||6)+8,0,Math.PI*2);ctx.fill();
@@ -399,7 +425,7 @@ function drawGame(){
   ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.stroke();
   
   // Fade
-  const grd=ctx.createRadialGradient(me.x,me.y,VIEW_DIST*.7,me.x,me.y,VIEW_DIST);
+  const grd=ctx.createRadialGradient(myX,myY,VIEW_DIST*.7,myX,myY,VIEW_DIST);
   grd.addColorStop(0,'rgba(0,0,0,0)');grd.addColorStop(1,'rgba(0,0,0,.7)');
   ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.fillStyle=grd;ctx.fill();
   
@@ -408,10 +434,10 @@ function drawGame(){
   
   // Draw me
   const col=characters[me.charIdx]?.color||'#fff';
-  ctx.fillStyle=col;ctx.beginPath();ctx.arc(me.x,me.y,me.radius||6,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,.6)';ctx.beginPath();ctx.arc(me.x+Math.cos(me.angle)*6,me.y+Math.sin(me.angle)*6,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=col;ctx.beginPath();ctx.arc(myX,myY,me.radius||6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.beginPath();ctx.arc(myX+Math.cos(myAngle)*6,myY+Math.sin(myAngle)*6,3,0,Math.PI*2);ctx.fill();
   // Ambient
-  ctx.save();ctx.globalCompositeOperation='lighter';const ag=ctx.createRadialGradient(me.x,me.y,0,me.x,me.y,30);ag.addColorStop(0,'rgba(40,40,40,.4)');ag.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=ag;ctx.fillRect(me.x-30,me.y-30,60,60);ctx.restore();
+  ctx.save();ctx.globalCompositeOperation='lighter';const ag=ctx.createRadialGradient(myX,myY,0,myX,myY,30);ag.addColorStop(0,'rgba(40,40,40,.4)');ag.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=ag;ctx.fillRect(myX-30,myY-30,60,60);ctx.restore();
   
   // HUD
   const hud=document.getElementById('gameHudText');
