@@ -73,7 +73,6 @@
   canvas{image-rendering:pixelated;display:block}
   .game-hud{position:absolute;top:12px;left:12px;font-size:13px;pointer-events:none;text-shadow:1px 1px 3px #000;z-index:10}
   .game-exit{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.1);border:1px solid #555;color:#aaa;padding:5px 14px;border-radius:16px;font-size:11px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;z-index:10}
-  .dash-bar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:10}
   .joystick{position:absolute;bottom:60px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);z-index:20;display:none;touch-action:none}
   .joystick.left{left:30px}.joystick.right{right:30px}
   .joystick-knob{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
@@ -142,7 +141,6 @@
   <div class="game-hud"><div id="gameHudText"></div></div>
   <button class="game-exit" id="gameExitBtn">나가기</button>
   <canvas id="game" tabindex="0"></canvas>
-  <div class="dash-bar" id="dashBar"></div>
   <div class="joystick left" id="joyLeft"><div class="joystick-knob" id="knobLeft"></div><div class="joystick-label">시야</div></div>
   <div class="joystick right" id="joyRight"><div class="joystick-knob" id="knobRight"></div><div class="joystick-label">이동</div></div>
 </div>
