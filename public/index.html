@@ -329,7 +329,8 @@ function setupJoy(id,knobId,key){
 setupJoy('joyLeft','knobLeft','left');setupJoy('joyRight','knobRight','right');
 
 // Raycasting
-function castRay(ox,oy,a,md){const s=8,cosA=Math.cos(a),sinA=Math.sin(a);let d=0;while(d<md){d+=s;const px=ox+cosA*d,py=oy+sinA*d;if(px<0||px>mapW||py<0||py>mapH)return d;for(let i=0;i<gameWalls.length;i++){const w=gameWalls[i];if(px>=w.x&&px<=w.x+w.w&&py>=w.y&&py<=w.y+w.h)return d}}return md}
+function castRay(ox,oy,a,md){const s=8,cosA=Math.cos(a),sinA=Math.sin(a);let d=0;while(d<md){d+=s;const px=ox+cosA*d,py=oy+sinA*d;if(px<0||px>mapW||py<0||py>mapH)return d;for(let i=0;i<rayWalls.length;i++){const w=rayWalls[i];if(px>=w.x&&px<=w.x+w.w&&py>=w.y&&py<=w.y+w.h)return d}}return md}
+let rayWalls=[]; // walls near player, rebuilt each frame
 function isVis(sx,sy,sa,px,py){const dx=px-sx,dy=py-sy,d=Math.sqrt(dx*dx+dy*dy);if(d>VIEW_DIST)return false;let ad=Math.atan2(dy,dx)-sa;while(ad>Math.PI)ad-=Math.PI*2;while(ad<-Math.PI)ad+=Math.PI*2;if(Math.abs(ad)>FOV)return false;return castRay(sx,sy,Math.atan2(dy,dx),d)>=d-5}
 
 function startGame(d){
@@ -412,6 +413,15 @@ function drawGame(){
 
   // Black bg
   ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+
+  // Build nearby-walls list for fast raycasting (only walls within view range)
+  const vr=VIEW_DIST+20;
+  rayWalls=[];
+  for(let i=0;i<gameWalls.length;i++){
+    const w=gameWalls[i];
+    if(w.x+w.w<myX-vr||w.x>myX+vr||w.y+w.h<myY-vr||w.y>myY+vr)continue;
+    rayWalls.push(w);
+  }
 
   // Raycast in world space, draw in screen space
   const rays=32,pts=[{x:W/2,y:H/2}];
