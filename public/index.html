@@ -87,7 +87,7 @@ function connect(){
           const dx=serverMe.x-localX,dy=serverMe.y-localY;
           const diff=Math.sqrt(dx*dx+dy*dy);
           if(diff>220){localX=serverMe.x;localY=serverMe.y;localVX=0;localVY=0}
-          else if(diff>10){localX+=dx*0.18;localY+=dy*0.18}
+          else if(diff>30&&dx*localVX+dy*localVY>0){localX+=dx*0.08;localY+=dy*0.08}
         }
         break;
       case 'game_end': gameActive=false; showToast(d.reason); showScreen('waitingScreen'); isReady=false; break;
@@ -208,7 +208,7 @@ function updateLocal(dt){
   if(me.caught&&!me.isSeeker){localVX=0;localVY=0;return}
   const {mx,my}=getMoveVector();
   if(joy.left.active){localAngle=joy.left.angle}else{localAngle=Math.atan2(mouse.y-H/2,mouse.x-W/2)}
-  const pxPerSec=(me.isSeeker?7.5:5.25)*30;
+  const pxPerSec=(me.isSeeker?7.5:5.25)*30*0.94;
   const smoothing=1-Math.pow(0.45,dt*30);
   localVX+=((mx*pxPerSec)-localVX)*smoothing;
   localVY+=((my*pxPerSec)-localVY)*smoothing;
