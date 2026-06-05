@@ -188,8 +188,8 @@ function connect(){
         if(serverMe){
           const dx=serverMe.x-localX,dy=serverMe.y-localY;
           const diff=Math.sqrt(dx*dx+dy*dy);
-          if(diff>40){localX=serverMe.x;localY=serverMe.y}
-          else if(diff>3){localX+=dx*0.1;localY+=dy*0.1}
+          // Only snap on large desync (teleport/lag), no gentle pull-back
+          if(diff>80){localX=serverMe.x;localY=serverMe.y}
         }
         break;
       case 'game_end': gameActive=false; showToast(d.reason); showScreen('waitingScreen'); isReady=false; break;
