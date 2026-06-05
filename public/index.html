@@ -14,162 +14,60 @@
   .btn-main:hover{opacity:.9}.btn-main:active{transform:scale(.96)}.btn-main:disabled{opacity:.3;cursor:not-allowed}
   .input-line{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:15px;padding:12px 4px;width:280px;text-align:center;outline:none;transition:border-color .2s}
   .input-line::placeholder{color:var(--muted)}.input-line:focus{border-color:rgba(255,255,255,.6)}
-  /* Login */
-  #loginScreen{align-items:center;justify-content:center;gap:20px}
-  .login-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:900}
-  /* Lobby */
+  #loginScreen{align-items:center;justify-content:center;gap:20px}.login-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:900}
   .lobby-header{padding:20px 24px 12px;font-size:14px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center}
-  .user-name{color:var(--text);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
-  .user-name:hover{text-decoration:underline}
-  .room-list{flex:1;overflow-y:auto;padding:16px 24px;display:flex;flex-direction:column;gap:12px}
-  .room-list::-webkit-scrollbar{width:6px}.room-list::-webkit-scrollbar-thumb{background:#444;border-radius:3px}
-  .room-card{background:transparent;border:1px solid var(--border);border-radius:8px;padding:20px 24px;cursor:pointer;position:relative;transition:background .2s,border-color .2s}
-  .room-card:hover{background:rgba(255,255,255,.03);border-color:#666}
-  .room-number{font-size:12px;color:var(--muted);margin-bottom:8px}
-  .room-title{font-size:22px;font-weight:900;margin-bottom:4px}
-  .room-host{font-size:13px;color:var(--muted);margin-bottom:2px}
-  .room-count{font-size:13px;color:var(--muted)}
-  .room-status{position:absolute;bottom:20px;right:24px;font-size:16px;font-weight:700}
-  .room-status.waiting{color:var(--muted)}.room-status.playing{color:var(--text)}
-  .room-dot{position:absolute;top:20px;right:24px;width:12px;height:12px;border-radius:50%}
-  .room-dot.waiting{background:var(--red)}.room-dot.playing{background:var(--green)}
-  .room-card.locked .room-title::after{content:' 🔒';font-size:14px}
+  .user-name{color:var(--text);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}.user-name:hover{text-decoration:underline}
+  .room-list{flex:1;overflow-y:auto;padding:16px 24px;display:flex;flex-direction:column;gap:12px}.room-list::-webkit-scrollbar{width:6px}.room-list::-webkit-scrollbar-thumb{background:#444;border-radius:3px}
+  .room-card{background:transparent;border:1px solid var(--border);border-radius:8px;padding:20px 24px;cursor:pointer;position:relative;transition:background .2s,border-color .2s}.room-card:hover{background:rgba(255,255,255,.03);border-color:#666}
+  .room-number{font-size:12px;color:var(--muted);margin-bottom:8px}.room-title{font-size:22px;font-weight:900;margin-bottom:4px}.room-host,.room-count{font-size:13px;color:var(--muted);margin-bottom:2px}
+  .room-status{position:absolute;bottom:20px;right:24px;font-size:16px;font-weight:700}.room-status.waiting{color:var(--muted)}.room-status.playing{color:var(--text)}
+  .room-dot{position:absolute;top:20px;right:24px;width:12px;height:12px;border-radius:50%}.room-dot.waiting{background:var(--red)}.room-dot.playing{background:var(--green)}.room-card.locked .room-title::after{content:' 🔒';font-size:14px}
   .lobby-bottom{padding:16px 24px 24px;display:flex;gap:10px;justify-content:center;border-top:1px solid rgba(255,255,255,.06)}
-  .btn-sec{background:transparent;color:var(--muted);border:1px solid var(--border);padding:14px 30px;border-radius:50px;font-family:'Noto Sans KR',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}
-  .btn-sec:hover{border-color:#666;color:var(--text)}
-  /* Modal */
-  .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center}
-  .modal-overlay.active{display:flex}
-  .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;width:380px;max-width:90vw}
-  .modal-title{font-size:20px;font-weight:900;margin-bottom:24px;text-align:center}
-  .modal-field{margin-bottom:18px}
-  .modal-label{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between}
-  .modal-label .optional{font-size:11px;color:rgba(255,255,255,.25)}
-  .modal-input{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:15px;padding:10px 2px;width:100%;outline:none}
-  .modal-input::placeholder{color:rgba(255,255,255,.2)}.modal-input:focus{border-color:rgba(255,255,255,.5)}
-  .modal-buttons{display:flex;gap:10px;margin-top:28px}
-  .modal-btn{flex:1;padding:12px 0;border-radius:50px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border:none}
-  .modal-btn.primary{background:#fff;color:#111}.modal-btn.secondary{background:transparent;color:var(--muted);border:1px solid var(--border)}
-  /* Waiting */
-  .waiting-header{padding:20px 24px;display:flex;align-items:baseline;gap:16px;border-bottom:1px solid rgba(255,255,255,.06)}
-  .waiting-room-info{font-size:22px;font-weight:900}
-  .waiting-room-meta{font-size:13px;color:var(--muted);display:flex;gap:12px}
+  .btn-sec{background:transparent;color:var(--muted);border:1px solid var(--border);padding:14px 30px;border-radius:50px;font-family:'Noto Sans KR',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}.btn-sec:hover{border-color:#666;color:var(--text)}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center}.modal-overlay.active{display:flex}
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;width:380px;max-width:90vw}.modal-title{font-size:20px;font-weight:900;margin-bottom:24px;text-align:center}
+  .modal-field{margin-bottom:18px}.modal-label{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between}.modal-label .optional{font-size:11px;color:rgba(255,255,255,.25)}
+  .modal-input{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:15px;padding:10px 2px;width:100%;outline:none}.modal-input::placeholder{color:rgba(255,255,255,.2)}.modal-input:focus{border-color:rgba(255,255,255,.5)}
+  .modal-buttons{display:flex;gap:10px;margin-top:28px}.modal-btn{flex:1;padding:12px 0;border-radius:50px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border:none}.modal-btn.primary{background:#fff;color:#111}.modal-btn.secondary{background:transparent;color:var(--muted);border:1px solid var(--border)}
+  .waiting-header{padding:20px 24px;display:flex;align-items:baseline;gap:16px;border-bottom:1px solid rgba(255,255,255,.06)}.waiting-room-info{font-size:22px;font-weight:900}.waiting-room-meta{font-size:13px;color:var(--muted);display:flex;gap:12px}
   .waiting-back{position:absolute;top:20px;right:24px;background:none;border:1px solid var(--border);color:var(--muted);padding:6px 16px;border-radius:20px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer}
-  .char-select-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px}
-  .char-carousel{display:flex;align-items:center;gap:16px}
-  .char-option{width:70px;height:70px;border-radius:50%;cursor:pointer;transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s;border:3px solid transparent;opacity:.6}
-  .char-option:hover{transform:scale(1.1);opacity:.8}
-  .char-option.selected{width:110px;height:110px;opacity:1;border-color:#fff;box-shadow:0 0 20px rgba(255,255,255,.15)}
-  .char-name{font-size:16px;font-weight:700}
-  .ready-btn{background:transparent;color:var(--green);border:2px solid var(--green);padding:14px 80px;border-radius:50px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s}
-  .ready-btn:hover{background:var(--green);color:#111}.ready-btn.readied{background:var(--green);color:#111}
-  .player-slots{display:flex;gap:14px;justify-content:center;padding:20px 24px 28px;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap}
-  .player-slot{display:flex;flex-direction:column;align-items:center;gap:6px}
-  .player-avatar{width:52px;height:52px;border-radius:50%;border:3px solid #333;background:#333}
-  .player-avatar.ready{border-color:var(--green)}.player-avatar.not-ready{border-color:var(--red)}.player-avatar.empty{background:#2a2a2a;border-color:#333}
-  .player-name{font-size:11px;color:var(--muted);max-width:60px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  /* Game */
-  #gameScreen{position:relative;align-items:center;justify-content:center}
-  canvas{image-rendering:pixelated;display:block}
-  .game-hud{position:absolute;top:12px;left:12px;font-size:13px;pointer-events:none;text-shadow:1px 1px 3px #000;z-index:10}
-  .game-exit{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.1);border:1px solid #555;color:#aaa;padding:5px 14px;border-radius:16px;font-size:11px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;z-index:10}
-  .joystick{position:absolute;bottom:60px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);z-index:20;display:none;touch-action:none}
-  .joystick.left{left:30px}.joystick.right{right:30px}
-  .joystick-knob{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
-  .joystick-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(255,255,255,.3);white-space:nowrap}
-  .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-60px);background:rgba(255,255,255,.1);backdrop-filter:blur(12px);color:var(--text);font-size:13px;padding:10px 20px;border-radius:20px;opacity:0;transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .4s;pointer-events:none;z-index:200}
-  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-  .no-rooms{text-align:center;color:var(--muted);padding:60px 20px;font-size:14px}
-  @media(pointer:coarse){.joystick{display:block}}
+  .char-select-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px}.char-carousel{display:flex;align-items:center;gap:16px}
+  .char-option{width:70px;height:70px;border-radius:50%;cursor:pointer;transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s;border:3px solid transparent;opacity:.6}.char-option:hover{transform:scale(1.1);opacity:.8}.char-option.selected{width:110px;height:110px;opacity:1;border-color:#fff;box-shadow:0 0 20px rgba(255,255,255,.15)}
+  .char-name{font-size:16px;font-weight:700}.ready-btn{background:transparent;color:var(--green);border:2px solid var(--green);padding:14px 80px;border-radius:50px;font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s}.ready-btn:hover,.ready-btn.readied{background:var(--green);color:#111}
+  .player-slots{display:flex;gap:14px;justify-content:center;padding:20px 24px 28px;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap}.player-slot{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .player-avatar{width:52px;height:52px;border-radius:50%;border:3px solid #333;background:#333}.player-avatar.ready{border-color:var(--green)}.player-avatar.not-ready{border-color:var(--red)}.player-avatar.empty{background:#2a2a2a;border-color:#333}.player-name{font-size:11px;color:var(--muted);max-width:60px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #gameScreen{position:relative;align-items:center;justify-content:center}canvas{image-rendering:pixelated;display:block}
+  .game-hud{position:absolute;top:12px;left:12px;font-size:13px;pointer-events:none;text-shadow:1px 1px 3px #000;z-index:10}.game-exit{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.1);border:1px solid #555;color:#aaa;padding:5px 14px;border-radius:16px;font-size:11px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;z-index:10}
+  .joystick{position:absolute;bottom:60px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);z-index:20;display:none;touch-action:none}.joystick.left{left:30px}.joystick.right{right:30px}.joystick-knob{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}.joystick-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(255,255,255,.3);white-space:nowrap}
+  .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-60px);background:rgba(255,255,255,.1);backdrop-filter:blur(12px);color:var(--text);font-size:13px;padding:10px 20px;border-radius:20px;opacity:0;transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .4s;pointer-events:none;z-index:200}.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  .no-rooms{text-align:center;color:var(--muted);padding:60px 20px;font-size:14px}@media(pointer:coarse){.joystick{display:block}}
 </style>
 </head>
 <body>
-
-<div class="screen active" id="loginScreen">
-  <div class="login-title">술래잡기</div>
-  <input class="input-line" id="loginId" placeholder="아이디를 입력해주세요" maxlength="12" autocomplete="off"/>
-  <button class="btn-main" id="loginBtn">입장하기</button>
-</div>
-
-<div class="screen" id="lobbyScreen">
-  <div class="lobby-header"><span>대기방</span><span class="user-name" id="lobbyUserName"></span></div>
-  <div class="room-list" id="roomList"></div>
-  <div class="lobby-bottom">
-    <button class="btn-sec" id="refreshBtn">새로고침</button>
-    <button class="btn-main" id="createRoomBtn">방만들기</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="createModal">
-  <div class="modal">
-    <div class="modal-title">방 만들기</div>
-    <div class="modal-field"><div class="modal-label">방 제목</div><input class="modal-input" id="roomTitleInput" placeholder="방 제목을 입력하세요" maxlength="20" autocomplete="off"/></div>
-    <div class="modal-field"><div class="modal-label">비밀번호<span class="optional">선택사항</span></div><input class="modal-input" id="roomPwInput" placeholder="미입력 시 공개방" maxlength="10" type="password" autocomplete="off"/></div>
-    <div class="modal-buttons"><button class="modal-btn secondary" id="createCancelBtn">취소</button><button class="modal-btn primary" id="createConfirmBtn">만들기</button></div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="pwModal">
-  <div class="modal" style="text-align:center">
-    <div class="modal-title">🔒 비밀번호 입력</div>
-    <div class="modal-field"><input class="modal-input" id="pwEntry" placeholder="비밀번호를 입력하세요" type="password" autocomplete="off"/></div>
-    <div class="modal-buttons"><button class="modal-btn secondary" id="pwCancelBtn">취소</button><button class="modal-btn primary" id="pwConfirmBtn">입장</button></div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="nickModal">
-  <div class="modal" style="text-align:center">
-    <div class="modal-title">닉네임 수정</div>
-    <div class="modal-field"><input class="modal-input" id="nickInput" placeholder="새 닉네임" maxlength="12" autocomplete="off"/></div>
-    <div class="modal-buttons"><button class="modal-btn secondary" id="nickCancelBtn">취소</button><button class="modal-btn primary" id="nickConfirmBtn">변경</button></div>
-  </div>
-</div>
-
-<div class="screen" id="waitingScreen">
-  <div class="waiting-header"><span class="waiting-room-info" id="waitingRoomInfo"></span><span class="waiting-room-meta" id="waitingRoomMeta"></span></div>
-  <button class="waiting-back" id="waitingBackBtn">나가기</button>
-  <div class="char-select-area">
-    <div class="char-carousel" id="charCarousel"></div>
-    <div class="char-name" id="charName"></div>
-    <button class="btn-main" id="startBtn" style="display:none">시작하기</button>
-    <button class="ready-btn" id="readyBtn" style="display:none">준비완료</button>
-  </div>
-  <div class="player-slots" id="playerSlots"></div>
-</div>
-
-<div class="screen" id="gameScreen">
-  <div class="game-hud"><div id="gameHudText"></div></div>
-  <button class="game-exit" id="gameExitBtn">나가기</button>
-  <canvas id="game" tabindex="0"></canvas>
-  <div class="joystick left" id="joyLeft"><div class="joystick-knob" id="knobLeft"></div><div class="joystick-label">시야</div></div>
-  <div class="joystick right" id="joyRight"><div class="joystick-knob" id="knobRight"></div><div class="joystick-label">이동</div></div>
-</div>
-
+<div class="screen active" id="loginScreen"><div class="login-title">술래잡기</div><input class="input-line" id="loginId" placeholder="아이디를 입력해주세요" maxlength="12" autocomplete="off"/><button class="btn-main" id="loginBtn">입장하기</button></div>
+<div class="screen" id="lobbyScreen"><div class="lobby-header"><span>대기방</span><span class="user-name" id="lobbyUserName"></span></div><div class="room-list" id="roomList"></div><div class="lobby-bottom"><button class="btn-sec" id="refreshBtn">새로고침</button><button class="btn-main" id="createRoomBtn">방만들기</button></div></div>
+<div class="modal-overlay" id="createModal"><div class="modal"><div class="modal-title">방 만들기</div><div class="modal-field"><div class="modal-label">방 제목</div><input class="modal-input" id="roomTitleInput" placeholder="방 제목을 입력하세요" maxlength="20" autocomplete="off"/></div><div class="modal-field"><div class="modal-label">비밀번호<span class="optional">선택사항</span></div><input class="modal-input" id="roomPwInput" placeholder="미입력 시 공개방" maxlength="10" type="password" autocomplete="off"/></div><div class="modal-buttons"><button class="modal-btn secondary" id="createCancelBtn">취소</button><button class="modal-btn primary" id="createConfirmBtn">만들기</button></div></div></div>
+<div class="modal-overlay" id="pwModal"><div class="modal" style="text-align:center"><div class="modal-title">🔒 비밀번호 입력</div><div class="modal-field"><input class="modal-input" id="pwEntry" placeholder="비밀번호를 입력하세요" type="password" autocomplete="off"/></div><div class="modal-buttons"><button class="modal-btn secondary" id="pwCancelBtn">취소</button><button class="modal-btn primary" id="pwConfirmBtn">입장</button></div></div></div>
+<div class="modal-overlay" id="nickModal"><div class="modal" style="text-align:center"><div class="modal-title">닉네임 수정</div><div class="modal-field"><input class="modal-input" id="nickInput" placeholder="새 닉네임" maxlength="12" autocomplete="off"/></div><div class="modal-buttons"><button class="modal-btn secondary" id="nickCancelBtn">취소</button><button class="modal-btn primary" id="nickConfirmBtn">변경</button></div></div></div>
+<div class="screen" id="waitingScreen"><div class="waiting-header"><span class="waiting-room-info" id="waitingRoomInfo"></span><span class="waiting-room-meta" id="waitingRoomMeta"></span></div><button class="waiting-back" id="waitingBackBtn">나가기</button><div class="char-select-area"><div class="char-carousel" id="charCarousel"></div><div class="char-name" id="charName"></div><button class="btn-main" id="startBtn" style="display:none">시작하기</button><button class="ready-btn" id="readyBtn" style="display:none">준비완료</button></div><div class="player-slots" id="playerSlots"></div></div>
+<div class="screen" id="gameScreen"><div class="game-hud"><div id="gameHudText"></div></div><button class="game-exit" id="gameExitBtn">나가기</button><canvas id="game" tabindex="0"></canvas><div class="joystick left" id="joyLeft"><div class="joystick-knob" id="knobLeft"></div><div class="joystick-label">시야</div></div><div class="joystick right" id="joyRight"><div class="joystick-knob" id="knobRight"></div><div class="joystick-label">이동</div></div></div>
 <div class="toast" id="toast"></div>
-
 <script>
-// ═══ CONFIG ═══
 const characters=[
   {name:'빨강이',color:'#e04040'},{name:'파랑이',color:'#4080e0'},
   {name:'초록이',color:'#40c040'},{name:'노랑이',color:'#e0c020'},
   {name:'보라이',color:'#a050e0'},{name:'주황이',color:'#e08030'}
 ];
 const FOV=Math.PI/5, VIEW_DIST=350;
-
-// ═══ STATE ═══
 let ws=null, myName='', myId='', selectedChar=2, isHost=false, isReady=false;
 let currentRoomId=null, joinTarget=null;
 let gameActive=false, isSeeker=false, seekerId='', seekerName='';
 let gamePlayers=[], gameWalls=[], elapsed='0';
 let mapW=3000, mapH=2000;
 let startOverlayTimer=0;
-
-// ═══ UTIL ═══
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
 function send(d){if(ws&&ws.readyState===1)ws.send(JSON.stringify(d))}
-
-// ═══ WEBSOCKET ═══
 function connect(){
   const proto=location.protocol==='https:'?'wss:':'ws:';
   ws=new WebSocket(proto+'//'+location.host);
@@ -188,8 +86,7 @@ function connect(){
         if(serverMe){
           const dx=serverMe.x-localX,dy=serverMe.y-localY;
           const diff=Math.sqrt(dx*dx+dy*dy);
-          // Only snap on large desync (teleport/lag), no gentle pull-back
-          if(diff>80){localX=serverMe.x;localY=serverMe.y}
+          if(diff>80){localX=serverMe.x;localY=serverMe.y;localVX=0;localVY=0}
         }
         break;
       case 'game_end': gameActive=false; showToast(d.reason); showScreen('waitingScreen'); isReady=false; break;
@@ -198,8 +95,6 @@ function connect(){
     }
   };
 }
-
-// ═══ LOGIN ═══
 document.getElementById('loginBtn').onclick=()=>{
   const n=document.getElementById('loginId').value.trim();
   if(!n){showToast('아이디를 입력해주세요');return}
@@ -209,105 +104,60 @@ document.getElementById('loginBtn').onclick=()=>{
   connect();
 };
 document.getElementById('loginId').onkeydown=e=>{if(e.key==='Enter')document.getElementById('loginBtn').click()};
-
-// ═══ NICK EDIT ═══
 document.getElementById('lobbyUserName').onclick=()=>{document.getElementById('nickInput').value=myName;document.getElementById('nickModal').classList.add('active');document.getElementById('nickInput').focus()};
 document.getElementById('nickCancelBtn').onclick=()=>document.getElementById('nickModal').classList.remove('active');
-document.getElementById('nickConfirmBtn').onclick=()=>{
-  const n=document.getElementById('nickInput').value.trim();if(!n)return;
-  myName=n;send({type:'update_name',name:n});
-  document.getElementById('lobbyUserName').innerHTML=n+' <span style="font-size:12px;opacity:.5">✏️</span>';
-  document.getElementById('nickModal').classList.remove('active');showToast('닉네임 변경됨');
-};
+document.getElementById('nickConfirmBtn').onclick=()=>{const n=document.getElementById('nickInput').value.trim();if(!n)return;myName=n;send({type:'update_name',name:n});document.getElementById('lobbyUserName').innerHTML=n+' <span style="font-size:12px;opacity:.5">✏️</span>';document.getElementById('nickModal').classList.remove('active');showToast('닉네임 변경됨')};
 document.getElementById('nickModal').onclick=e=>{if(e.target.id==='nickModal')e.target.classList.remove('active')};
-
-// ═══ LOBBY ═══
 function renderRoomList(rooms){
   const list=document.getElementById('roomList');list.innerHTML='';
   if(!rooms||rooms.length===0){list.innerHTML='<div class="no-rooms">아직 방이 없어요. 방을 만들어보세요!</div>';return}
   for(const r of rooms){
     const c=document.createElement('div');c.className='room-card'+(r.locked?' locked':'');
     c.innerHTML=`<div class="room-number">${r.id}</div><div class="room-dot ${r.status}"></div><div class="room-title">${r.title}</div><div class="room-host">${r.host}</div><div class="room-count">${r.count} / ${r.max}</div><div class="room-status ${r.status}">${r.status==='waiting'?r.count+'명 대기중':'게임중'}</div>`;
-    c.onclick=()=>{
-      if(r.status==='playing'){showToast('게임 진행 중');return}
-      if(r.count>=r.max){showToast('방이 가득 찼어요');return}
-      if(r.locked){joinTarget=r.id;document.getElementById('pwModal').classList.add('active');document.getElementById('pwEntry').value='';document.getElementById('pwEntry').focus();return}
-      send({type:'join_room',roomId:r.id,charIdx:selectedChar});
-    };
+    c.onclick=()=>{if(r.status==='playing'){showToast('게임 진행 중');return}if(r.count>=r.max){showToast('방이 가득 찼어요');return}if(r.locked){joinTarget=r.id;document.getElementById('pwModal').classList.add('active');document.getElementById('pwEntry').value='';document.getElementById('pwEntry').focus();return}send({type:'join_room',roomId:r.id,charIdx:selectedChar})};
     list.appendChild(c);
   }
 }
 document.getElementById('refreshBtn').onclick=()=>send({type:'list_rooms'});
-
-// PW
 document.getElementById('pwCancelBtn').onclick=()=>document.getElementById('pwModal').classList.remove('active');
-document.getElementById('pwConfirmBtn').onclick=()=>{
-  const pw=document.getElementById('pwEntry').value;if(!pw){showToast('비밀번호를 입력해주세요');return}
-  document.getElementById('pwModal').classList.remove('active');
-  send({type:'join_room',roomId:joinTarget,password:pw,charIdx:selectedChar});
-};
+document.getElementById('pwConfirmBtn').onclick=()=>{const pw=document.getElementById('pwEntry').value;if(!pw){showToast('비밀번호를 입력해주세요');return}document.getElementById('pwModal').classList.remove('active');send({type:'join_room',roomId:joinTarget,password:pw,charIdx:selectedChar})};
 document.getElementById('pwEntry').onkeydown=e=>{if(e.key==='Enter')document.getElementById('pwConfirmBtn').click()};
 document.getElementById('pwModal').onclick=e=>{if(e.target.id==='pwModal')e.target.classList.remove('active')};
-
-// CREATE
 document.getElementById('createRoomBtn').onclick=()=>{document.getElementById('createModal').classList.add('active');document.getElementById('roomTitleInput').value='';document.getElementById('roomPwInput').value='';document.getElementById('roomTitleInput').focus()};
 document.getElementById('createCancelBtn').onclick=()=>document.getElementById('createModal').classList.remove('active');
-document.getElementById('createConfirmBtn').onclick=()=>{
-  const t=document.getElementById('roomTitleInput').value.trim();if(!t){showToast('방 제목을 입력해주세요');return}
-  document.getElementById('createModal').classList.remove('active');
-  send({type:'create_room',title:t,password:document.getElementById('roomPwInput').value.trim()||null,charIdx:selectedChar});
-};
+document.getElementById('createConfirmBtn').onclick=()=>{const t=document.getElementById('roomTitleInput').value.trim();if(!t){showToast('방 제목을 입력해주세요');return}document.getElementById('createModal').classList.remove('active');send({type:'create_room',title:t,password:document.getElementById('roomPwInput').value.trim()||null,charIdx:selectedChar})};
 document.getElementById('createModal').onclick=e=>{if(e.target.id==='createModal')e.target.classList.remove('active')};
-
-// ═══ WAITING ROOM ═══
 function updateWaitingRoom(d){
   const r=d.room, pl=d.players;
   document.getElementById('waitingRoomInfo').textContent=r.id+' '+r.title;
   document.getElementById('waitingRoomMeta').innerHTML=`<span>${pl.length} / 8</span>`;
-  
   isHost=(r.hostId===myId);
-  
-  if(isHost){document.getElementById('startBtn').style.display='';document.getElementById('readyBtn').style.display='none';
-    const others=pl.filter(p=>p.id!==myId);
-    document.getElementById('startBtn').disabled=!(others.length>0&&others.every(p=>p.ready));
-  }else{document.getElementById('startBtn').style.display='none';document.getElementById('readyBtn').style.display=''}
-
-  // Render chars
+  if(isHost){document.getElementById('startBtn').style.display='';document.getElementById('readyBtn').style.display='none';const others=pl.filter(p=>p.id!==myId);document.getElementById('startBtn').disabled=!(others.length>0&&others.every(p=>p.ready))}
+  else{document.getElementById('startBtn').style.display='none';document.getElementById('readyBtn').style.display=''}
   renderCharCarousel();
-
-  // Player slots
   const s=document.getElementById('playerSlots');s.innerHTML='';
   for(let i=0;i<8;i++){
     const sl=document.createElement('div');sl.className='player-slot';
     const av=document.createElement('div');av.className='player-avatar';
     const nm=document.createElement('div');nm.className='player-name';
-    if(i<pl.length){const p=pl[i];av.style.background=characters[p.charIdx]?.color||'#888';
-      if(p.id===r.hostId)av.classList.add('ready');
-      else av.classList.add(p.ready?'ready':'not-ready');
-      nm.textContent=p.name;
-    }else{av.classList.add('empty')}
+    if(i<pl.length){const p=pl[i];av.style.background=characters[p.charIdx]?.color||'#888';if(p.id===r.hostId)av.classList.add('ready');else av.classList.add(p.ready?'ready':'not-ready');nm.textContent=p.name}
+    else{av.classList.add('empty')}
     sl.appendChild(av);sl.appendChild(nm);s.appendChild(sl);
   }
 }
-
 function renderCharCarousel(){
   const c=document.getElementById('charCarousel');c.innerHTML='';
-  characters.forEach((ch,i)=>{const e=document.createElement('div');e.className='char-option'+(i===selectedChar?' selected':'');e.style.background=ch.color;
-    e.onclick=()=>{selectedChar=i;renderCharCarousel();send({type:'update_char',charIdx:i})};c.appendChild(e)});
+  characters.forEach((ch,i)=>{const e=document.createElement('div');e.className='char-option'+(i===selectedChar?' selected':'');e.style.background=ch.color;e.onclick=()=>{selectedChar=i;renderCharCarousel();send({type:'update_char',charIdx:i})};c.appendChild(e)});
   document.getElementById('charName').textContent=characters[selectedChar].name;
 }
-
 document.getElementById('readyBtn').onclick=()=>{isReady=!isReady;const b=document.getElementById('readyBtn');b.classList.toggle('readied',isReady);b.textContent=isReady?'준비취소':'준비완료';send({type:'toggle_ready'})};
 document.getElementById('startBtn').onclick=()=>send({type:'start_game'});
 document.getElementById('waitingBackBtn').onclick=()=>{send({type:'leave_room'});currentRoomId=null;showScreen('lobbyScreen');send({type:'list_rooms'})};
 document.getElementById('gameExitBtn').onclick=()=>{gameActive=false;send({type:'leave_room'});currentRoomId=null;showScreen('lobbyScreen');send({type:'list_rooms'})};
-
-// ═══ GAME ═══
 const canvas=document.getElementById('game');
 const ctx=canvas.getContext('2d');
 const W=900,H=580;
 canvas.width=W;canvas.height=H;
-
 const keys={};
 const mouse={x:W/2,y:H/2};
 const gk=['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '];
@@ -315,8 +165,6 @@ const korMap={'ㅈ':'w','ㅁ':'a','ㄴ':'s','ㅇ':'d'};
 window.addEventListener('keydown',e=>{let k=e.key.toLowerCase();if(korMap[k])k=korMap[k];keys[k]=true;if(gk.includes(k))e.preventDefault()});
 window.addEventListener('keyup',e=>{let k=e.key.toLowerCase();if(korMap[k])k=korMap[k];keys[k]=false});
 canvas.addEventListener('mousemove',e=>{const r=canvas.getBoundingClientRect();mouse.x=(e.clientX-r.left)*(W/r.width);mouse.y=(e.clientY-r.top)*(H/r.height)});
-
-// Joystick
 const joy={left:{active:false,angle:0,dist:0},right:{active:false,angle:0,dist:0}};
 function setupJoy(id,knobId,key){
   const el=document.getElementById(id),knob=document.getElementById(knobId);let tid=null,cx,cy;
@@ -327,194 +175,98 @@ function setupJoy(id,knobId,key){
   el.addEventListener('touchend',end);el.addEventListener('touchcancel',end);
 }
 setupJoy('joyLeft','knobLeft','left');setupJoy('joyRight','knobRight','right');
-
-// Raycasting
 function castRay(ox,oy,a,md){const s=8,cosA=Math.cos(a),sinA=Math.sin(a);let d=0;while(d<md){d+=s;const px=ox+cosA*d,py=oy+sinA*d;if(px<0||px>mapW||py<0||py>mapH)return d;for(let i=0;i<rayWalls.length;i++){const w=rayWalls[i];if(px>=w.x&&px<=w.x+w.w&&py>=w.y&&py<=w.y+w.h)return d}}return md}
-let rayWalls=[]; // walls near player, rebuilt each frame
+let rayWalls=[];
 function isVis(sx,sy,sa,px,py){const dx=px-sx,dy=py-sy,d=Math.sqrt(dx*dx+dy*dy);if(d>VIEW_DIST)return false;let ad=Math.atan2(dy,dx)-sa;while(ad>Math.PI)ad-=Math.PI*2;while(ad<-Math.PI)ad+=Math.PI*2;if(Math.abs(ad)>FOV)return false;return castRay(sx,sy,Math.atan2(dy,dx),d)>=d-5}
-
 function startGame(d){
   myId=d.yourId;seekerId=d.seekerId;isSeeker=d.isSeeker;gamePlayers=d.players;gameWalls=d.walls;gameActive=true;
   seekerName=d.seekerName||'???';
   if(d.mapW)mapW=d.mapW;if(d.mapH)mapH=d.mapH;
   const me=d.players.find(p=>p.id===myId);
-  if(me){localX=me.x;localY=me.y;localAngle=me.angle}
-  predictionActive=false;
-  startOverlayTimer=180;
-  lastFrame=0;lastTick=0;
+  if(me){localX=me.x;localY=me.y;localAngle=me.angle;localVX=0;localVY=0}
+  predictionActive=false;startOverlayTimer=180;lastFrame=0;lastTick=0;
   for(const k in interp)delete interp[k];
   showScreen('gameScreen');canvas.focus();
   canvas.style.width=Math.min(900,window.innerWidth)+'px';
   canvas.style.height=Math.min(580,window.innerHeight-40)+'px';
   requestAnimationFrame(gameLoop);
 }
-
-// Client-side wall collision
-function circleRectLocal(cx,cy,cr,rx,ry,rw,rh){const clx=Math.max(rx,Math.min(cx,rx+rw)),cly=Math.max(ry,Math.min(cy,ry+rh)),dx=cx-clx,dy=cy-cly;return dx*dx+dy*dy<cr*cr}
-function canMoveLocal(x,y,r){
-  if(x-r<0||x+r>mapW||y-r<0||y+r>mapH)return false;
-  for(const w of gameWalls)if(circleRectLocal(x,y,r,w.x,w.y,w.w,w.h))return false;
-  return true;
+function circleRectLocal(cx,cy,cr,rx,ry,rw,rh){const clx=Math.max(rx,Math.min(cx,rx+rw)),cly=Math.max(ry,Math.min(cy,ry+rh)),dx=cx-clx,dy=cly-cy;return dx*dx+dy*dy<cr*cr}
+function canMoveLocal(x,y,r){if(x-r<0||x+r>mapW||y-r<0||y+r>mapH)return false;for(const w of gameWalls)if(circleRectLocal(x,y,r,w.x,w.y,w.w,w.h))return false;return true}
+let localX=0,localY=0,localVX=0,localVY=0,localAngle=0,predictionActive=false;
+const interp={};
+function getMoveVector(){
+  let mx=0,my=0;
+  if(joy.right.active){mx=Math.cos(joy.right.angle)*joy.right.dist;my=Math.sin(joy.right.angle)*joy.right.dist}
+  else{if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;if(mx&&my){mx*=.707;my*=.707}}
+  return {mx,my};
 }
-
-// Client-side prediction
-let localX=0,localY=0,localAngle=0,predictionActive=false;
-const interp={}; // smooth rendered positions for other players
-
-// Move local player every frame (smooth 60fps), time-based
 function updateLocal(dt){
   if(!gameActive)return;
   const me=gamePlayers.find(p=>p.id===myId);if(!me)return;
-  if(me.caught&&!me.isSeeker)return;
-
-  let mx=0,my=0;
-  if(joy.right.active){mx=Math.cos(joy.right.angle)*joy.right.dist;my=Math.sin(joy.right.angle)*joy.right.dist}
-  else{if(keys.w||keys.arrowup)my=-1;if(keys.s||keys.arrowdown)my=1;if(keys.a||keys.arrowleft)mx=-1;if(keys.d||keys.arrowright)mx=1;if(mx&&my){mx*=.707;my*=.707}}
-
-  // Vision angle
-  if(joy.left.active){localAngle=joy.left.angle}
-  else{localAngle=Math.atan2(mouse.y-H/2,mouse.x-W/2)}
-
-  // Speed per second (server: 30 ticks * speed)
+  if(me.caught&&!me.isSeeker){localVX=0;localVY=0;return}
+  const {mx,my}=getMoveVector();
+  if(joy.left.active){localAngle=joy.left.angle}else{localAngle=Math.atan2(mouse.y-H/2,mouse.x-W/2)}
   const pxPerSec=(me.isSeeker?7.5:5.25)*30;
+  const smoothing=1-Math.pow(0.45,dt*30);
+  localVX+=((mx*pxPerSec)-localVX)*smoothing;
+  localVY+=((my*pxPerSec)-localVY)*smoothing;
+  if(Math.abs(localVX)<1)localVX=0;if(Math.abs(localVY)<1)localVY=0;
   const r=me.isSeeker?16:14;
-  const step=pxPerSec*dt;
-  const nx=localX+mx*step;
-  const ny=localY+my*step;
+  const nx=localX+localVX*dt,ny=localY+localVY*dt;
   if(canMoveLocal(nx,localY,r))localX=nx;
   if(canMoveLocal(localX,ny,r))localY=ny;
   predictionActive=true;
 }
-
-// Send input to server (30fps)
 function sendInput(){
   if(!gameActive)return;
   const me=gamePlayers.find(p=>p.id===myId);if(!me)return;
   if(me.caught&&!me.isSeeker)return;
-
-  let mx=0,my=0;
-  if(joy.right.active){mx=Math.cos(joy.right.angle)*joy.right.dist;my=Math.sin(joy.right.angle)*joy.right.dist}
-  else{if(keys.w||keys.arrowup)my=-1;if(keys.s||keys.arrowdown)my=1;if(keys.a||keys.arrowleft)mx=-1;if(keys.d||keys.arrowright)mx=1;if(mx&&my){mx*=.707;my*=.707}}
-
+  const {mx,my}=getMoveVector();
   send({type:'input',moveX:mx,moveY:my,angle:localAngle});
 }
-
 function drawGame(){
   ctx.clearRect(0,0,W,H);
   const me=gamePlayers.find(p=>p.id===myId);
   if(!me){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);return}
-  const myX=predictionActive?localX:me.x;
-  const myY=predictionActive?localY:me.y;
-  const myAngle=predictionActive?localAngle:me.angle;
-
-  // Camera offset - center on player
-  const camX=myX-W/2;
-  const camY=myY-H/2;
-
-  // Black bg
+  const myX=predictionActive?localX:me.x,myY=predictionActive?localY:me.y,myAngle=predictionActive?localAngle:me.angle;
+  const camX=myX-W/2,camY=myY-H/2;
   ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
-
-  // Build nearby-walls list for fast raycasting (only walls within view range)
-  const vr=VIEW_DIST+20;
-  rayWalls=[];
-  for(let i=0;i<gameWalls.length;i++){
-    const w=gameWalls[i];
-    if(w.x+w.w<myX-vr||w.x>myX+vr||w.y+w.h<myY-vr||w.y>myY+vr)continue;
-    rayWalls.push(w);
-  }
-
-  // Raycast in world space, draw in screen space
+  const vr=VIEW_DIST+20;rayWalls=[];
+  for(let i=0;i<gameWalls.length;i++){const w=gameWalls[i];if(w.x+w.w<myX-vr||w.x>myX+vr||w.y+w.h<myY-vr||w.y>myY+vr)continue;rayWalls.push(w)}
   const rays=32,pts=[{x:W/2,y:H/2}];
-  for(let i=0;i<=rays;i++){
-    const a=myAngle-FOV+(FOV*2*i/rays);
-    const d=castRay(myX,myY,a,VIEW_DIST);
-    pts.push({x:W/2+Math.cos(a)*d,y:H/2+Math.sin(a)*d});
-  }
-
-  // Clip cone (screen space)
-  ctx.save();ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
-  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
-  ctx.closePath();ctx.clip();
-
-  // Scene inside cone
+  for(let i=0;i<=rays;i++){const a=myAngle-FOV+(FOV*2*i/rays);const d=castRay(myX,myY,a,VIEW_DIST);pts.push({x:W/2+Math.cos(a)*d,y:H/2+Math.sin(a)*d})}
+  ctx.save();ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.clip();
   ctx.fillStyle='#2a2a2a';ctx.fillRect(0,0,W,H);
-
-  // Map border (so you can see the edge)
-  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=2;
-  ctx.strokeRect(-camX,-camY,mapW,mapH);
-
-  // Walls in cone (screen space, only visible ones)
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=2;ctx.strokeRect(-camX,-camY,mapW,mapH);
   ctx.fillStyle='rgba(140,140,140,.7)';
-  for(let i=0;i<gameWalls.length;i++){const w=gameWalls[i];const sx=w.x-camX,sy=w.y-camY;if(sx+w.w<0||sx>W||sy+w.h<0||sy>H)continue;ctx.fillRect(sx,sy,w.w,w.h)}
-
-  // Other players in cone (interpolated positions)
+  for(let i=0;i<gameWalls.length;i++){const w=gameWalls[i],sx=w.x-camX,sy=w.y-camY;if(sx+w.w<0||sx>W||sy+w.h<0||sy>H)continue;ctx.fillRect(sx,sy,w.w,w.h)}
   for(const p of gamePlayers){
-    if(p.id===myId)continue;
-    if(p.caught&&!p.isSeeker)continue;
-    // Interpolate rendered position toward server position
+    if(p.id===myId)continue;if(p.caught&&!p.isSeeker)continue;
     if(!interp[p.id])interp[p.id]={x:p.x,y:p.y};
-    interp[p.id].x+=(p.x-interp[p.id].x)*0.25;
-    interp[p.id].y+=(p.y-interp[p.id].y)*0.25;
+    interp[p.id].x+=(p.x-interp[p.id].x)*0.25;interp[p.id].y+=(p.y-interp[p.id].y)*0.25;
     const px=interp[p.id].x,py=interp[p.id].y;
-    if(isVis(myX,myY,myAngle,px,py)){
-      const sx=px-camX,sy=py-camY;
-      ctx.fillStyle=characters[p.charIdx]?.color||'#888';
-      ctx.beginPath();ctx.arc(sx,sy,p.radius||14,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.arc(sx,sy,(p.radius||14)+10,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='12px "Noto Sans KR"';ctx.textAlign='center';
-      ctx.fillText(p.name,sx,sy-(p.radius||14)-10);
-    }
+    if(isVis(myX,myY,myAngle,px,py)){const sx=px-camX,sy=py-camY;ctx.fillStyle=characters[p.charIdx]?.color||'#888';ctx.beginPath();ctx.arc(sx,sy,p.radius||14,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.arc(sx,sy,(p.radius||14)+10,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='12px "Noto Sans KR"';ctx.textAlign='center';ctx.fillText(p.name,sx,sy-(p.radius||14)-10)}
   }
   ctx.restore();
-
-  // Cone edge (subtle)
-  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.stroke();
-
-  // Dim walls always visible (screen space, only visible ones)
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.stroke();
   ctx.fillStyle='rgba(140,140,140,.1)';
-  for(let i=0;i<gameWalls.length;i++){const w=gameWalls[i];const sx=w.x-camX,sy=w.y-camY;if(sx+w.w<0||sx>W||sy+w.h<0||sy>H)continue;ctx.fillRect(sx,sy,w.w,w.h)}
-
-  // Draw me (always at screen center)
+  for(let i=0;i<gameWalls.length;i++){const w=gameWalls[i],sx=w.x-camX,sy=w.y-camY;if(sx+w.w<0||sx>W||sy+w.h<0||sy>H)continue;ctx.fillRect(sx,sy,w.w,w.h)}
   const col=characters[me.charIdx]?.color||'#fff';
   ctx.fillStyle=col;ctx.beginPath();ctx.arc(W/2,H/2,me.radius||14,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='rgba(255,255,255,.6)';ctx.beginPath();ctx.arc(W/2+Math.cos(myAngle)*8,H/2+Math.sin(myAngle)*8,4,0,Math.PI*2);ctx.fill();
-  // My name
-  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='11px "Noto Sans KR"';ctx.textAlign='center';
-  ctx.fillText(me.name,W/2,H/2-(me.radius||14)-10);
-
-  // HUD
-  const hud=document.getElementById('gameHudText');
-  const caught=gamePlayers.filter(p=>!p.isSeeker&&p.caught).length;
-  const total=gamePlayers.filter(p=>!p.isSeeker).length;
-  if(isSeeker){hud.textContent='🔴 술래: '+seekerName+' | 잡은 수: '+caught+'/'+total}
-  else{const meCaught=me.caught;hud.textContent='🔴 술래: '+seekerName+(meCaught?' | ⚠️ 잡힘!':'')}
-
-  // Start overlay (seeker announcement)
-  if(startOverlayTimer>0){
-    startOverlayTimer--;
-    const alpha=Math.min(1,startOverlayTimer/30);
-    ctx.fillStyle='rgba(0,0,0,'+alpha*0.7+')';
-    ctx.fillRect(0,0,W,H);
-    ctx.fillStyle='rgba(255,255,255,'+alpha+')';
-    ctx.font='bold 28px "Noto Sans KR"';ctx.textAlign='center';
-    ctx.fillText('🔴 술래: '+seekerName,W/2,H/2-10);
-    ctx.font='16px "Noto Sans KR"';
-    ctx.fillStyle='rgba(255,255,255,'+alpha*0.6+')';
-    ctx.fillText(isSeeker?'당신이 술래입니다!':'술래를 피해 도망치세요!',W/2,H/2+30);
-  }
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='11px "Noto Sans KR"';ctx.textAlign='center';ctx.fillText(me.name,W/2,H/2-(me.radius||14)-10);
+  const hud=document.getElementById('gameHudText'),caught=gamePlayers.filter(p=>!p.isSeeker&&p.caught).length,total=gamePlayers.filter(p=>!p.isSeeker).length;
+  if(isSeeker){hud.textContent='🔴 술래: '+seekerName+' | 잡은 수: '+caught+'/'+total}else{hud.textContent='🔴 술래: '+seekerName+(me.caught?' | ⚠️ 잡힘!':'')}
+  if(startOverlayTimer>0){startOverlayTimer--;const alpha=Math.min(1,startOverlayTimer/30);ctx.fillStyle='rgba(0,0,0,'+alpha*0.7+')';ctx.fillRect(0,0,W,H);ctx.fillStyle='rgba(255,255,255,'+alpha+')';ctx.font='bold 28px "Noto Sans KR"';ctx.textAlign='center';ctx.fillText('🔴 술래: '+seekerName,W/2,H/2-10);ctx.font='16px "Noto Sans KR"';ctx.fillStyle='rgba(255,255,255,'+alpha*0.6+')';ctx.fillText(isSeeker?'당신이 술래입니다!':'술래를 피해 도망치세요!',W/2,H/2+30)}
 }
-
 let lastTick=0,lastFrame=0;
 function gameLoop(t){
   if(!gameActive)return;
   if(!lastFrame)lastFrame=t;
-  let dt=(t-lastFrame)/1000;
-  if(dt>0.05)dt=0.05; // cap to avoid jumps
-  lastFrame=t;
-
-  updateLocal(dt);           // smooth movement every frame
-  if(t-lastTick>1000/30){sendInput();lastTick=t}  // network send 30fps
+  let dt=(t-lastFrame)/1000;if(dt>0.05)dt=0.05;lastFrame=t;
+  updateLocal(dt);
+  if(t-lastTick>1000/30){sendInput();lastTick=t}
   drawGame();
   requestAnimationFrame(gameLoop);
 }
