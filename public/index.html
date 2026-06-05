@@ -156,13 +156,14 @@ const characters=[
   {name:'초록이',color:'#40c040'},{name:'노랑이',color:'#e0c020'},
   {name:'보라이',color:'#a050e0'},{name:'주황이',color:'#e08030'}
 ];
-const FOV=Math.PI/5, VIEW_DIST=220;
+const FOV=Math.PI/5, VIEW_DIST=350;
 
 // ═══ STATE ═══
 let ws=null, myName='', myId='', selectedChar=2, isHost=false, isReady=false;
 let currentRoomId=null, joinTarget=null;
 let gameActive=false, isSeeker=false, seekerId='', dashCd=0, dashMax=120;
 let gamePlayers=[], gameWalls=[], elapsed='0';
+let mapW=3000, mapH=2000;
 
 // ═══ UTIL ═══
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
@@ -182,21 +183,18 @@ function connect(){
       case 'room_joined': currentRoomId=d.roomId; isHost=d.isHost; myId=d.yourId; showScreen('waitingScreen'); break;
       case 'room_update': updateWaitingRoom(d); break;
       case 'game_start': startGame(d); break;
-      case 'game_state':
+      case 'sync':
         gamePlayers=d.players;elapsed=d.elapsed;
         const serverMe=d.players.find(p=>p.id===myId);
         if(serverMe){
           const dx=serverMe.x-localX,dy=serverMe.y-localY;
           const diff=Math.sqrt(dx*dx+dy*dy);
-          if(diff>40){
-            localX=serverMe.x;localY=serverMe.y;
-          }else if(diff>3){
-            localX+=dx*0.1;localY+=dy*0.1;
-          }
+          if(diff>40){localX=serverMe.x;localY=serverMe.y}
+          else if(diff>3){localX+=dx*0.1;localY+=dy*0.1}
         }
         break;
       case 'game_end': gameActive=false; showToast(d.reason); showScreen('waitingScreen'); isReady=false; break;
-      case 'player_caught': showToast('잡혔다!'); break;
+      case 'caught': showToast('잡혔다!'); break;
       case 'dash_cd': dashCd=d.cd; break;
       case 'error': showToast(d.msg); break;
     }
@@ -333,12 +331,12 @@ function setupJoy(id,knobId,key){
 setupJoy('joyLeft','knobLeft','left');setupJoy('joyRight','knobRight','right');
 
 // Raycasting
-function castRay(ox,oy,a,md){const s=3;let d=0;while(d<md){d+=s;const px=ox+Math.cos(a)*d,py=oy+Math.sin(a)*d;if(px<0||px>W||py<0||py>H)return d;for(const w of gameWalls)if(px>=w.x&&px<=w.x+w.w&&py>=w.y&&py<=w.y+w.h)return d}return md}
+function castRay(ox,oy,a,md){const s=4;let d=0;while(d<md){d+=s;const px=ox+Math.cos(a)*d,py=oy+Math.sin(a)*d;if(px<0||px>mapW||py<0||py>mapH)return d;for(const w of gameWalls)if(px>=w.x&&px<=w.x+w.w&&py>=w.y&&py<=w.y+w.h)return d}return md}
 function isVis(sx,sy,sa,px,py){const dx=px-sx,dy=py-sy,d=Math.sqrt(dx*dx+dy*dy);if(d>VIEW_DIST)return false;let ad=Math.atan2(dy,dx)-sa;while(ad>Math.PI)ad-=Math.PI*2;while(ad<-Math.PI)ad+=Math.PI*2;if(Math.abs(ad)>FOV)return false;return castRay(sx,sy,Math.atan2(dy,dx),d)>=d-5}
 
 function startGame(d){
   myId=d.yourId;seekerId=d.seekerId;isSeeker=d.isSeeker;gamePlayers=d.players;gameWalls=d.walls;dashCd=0;gameActive=true;
-  // Init local prediction
+  if(d.mapW)mapW=d.mapW;if(d.mapH)mapH=d.mapH;
   const me=d.players.find(p=>p.id===myId);
   if(me){localX=me.x;localY=me.y;localAngle=me.angle}
   predictionActive=false;
@@ -351,7 +349,7 @@ function startGame(d){
 // Client-side wall collision
 function circleRectLocal(cx,cy,cr,rx,ry,rw,rh){const clx=Math.max(rx,Math.min(cx,rx+rw)),cly=Math.max(ry,Math.min(cy,ry+rh)),dx=cx-clx,dy=cy-cly;return dx*dx+dy*dy<cr*cr}
 function canMoveLocal(x,y,r){
-  if(x-r<0||x+r>W||y-r<0||y+r>H)return false;
+  if(x-r<0||x+r>mapW||y-r<0||y+r>mapH)return false;
   for(const w of gameWalls)if(circleRectLocal(x,y,r,w.x,w.y,w.w,w.h))return false;
   return true;
 }
@@ -365,30 +363,21 @@ function sendInput(){
   if(me.caught&&!me.isSeeker)return;
   
   let mx=0,my=0;
+  if(joy.right.active){mx=Math.cos(joy.right.angle)*joy.right.dist;my=Math.sin(joy.right.angle)*joy.right.dist}
+  else{if(keys.w||keys.arrowup)my=-1;if(keys.s||keys.arrowdown)my=1;if(keys.a||keys.arrowleft)mx=-1;if(keys.d||keys.arrowright)mx=1;if(mx&&my){mx*=.707;my*=.707}}
 
-  if(joy.right.active){
-    mx=Math.cos(joy.right.angle)*joy.right.dist;
-    my=Math.sin(joy.right.angle)*joy.right.dist;
-  }else{
-    if(keys.w||keys.arrowup)my=-1;
-    if(keys.s||keys.arrowdown)my=1;
-    if(keys.a||keys.arrowleft)mx=-1;
-    if(keys.d||keys.arrowright)mx=1;
-    if(mx&&my){mx*=.707;my*=.707}
-  }
-
-  let angle = localAngle;
-  if (mx !== 0 || my !== 0) {
-    angle = Math.atan2(my, mx);
-  }
+  // Vision angle: joystick or mouse from screen center
+  let angle=localAngle;
+  if(joy.left.active){angle=joy.left.angle}
+  else{angle=Math.atan2(mouse.y-H/2,mouse.x-W/2)}
   
   const dash=keys[' ']&&isSeeker&&dashCd<=0;
   send({type:'input',moveX:mx,moveY:my,angle,dash});
   if(dashCd>0)dashCd--;
 
-  // Local prediction with wall collision
+  // Local prediction with wall collision (radius matches server)
   const speed=me.isSeeker?5:3.5;
-  const r=me.isSeeker?8:6;
+  const r=me.isSeeker?16:14;
   const nx=localX+mx*speed;
   const ny=localY+my*speed;
   if(canMoveLocal(nx,localY,r))localX=nx;
@@ -401,67 +390,89 @@ function drawGame(){
   ctx.clearRect(0,0,W,H);
   const me=gamePlayers.find(p=>p.id===myId);
   if(!me){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);return}
-  // Use local prediction for my position
   const myX=predictionActive?localX:me.x;
   const myY=predictionActive?localY:me.y;
   const myAngle=predictionActive?localAngle:me.angle;
 
+  // Camera offset - center on player
+  const camX=myX-W/2;
+  const camY=myY-H/2;
+
   // Black bg
   ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
-  
-  // Raycast cone for me
-  const rays=40,pts=[{x:myX,y:myY}];
-  for(let i=0;i<=rays;i++){const a=myAngle-FOV+(FOV*2*i/rays);const d=castRay(myX,myY,a,VIEW_DIST);pts.push({x:myX+Math.cos(a)*d,y:myY+Math.sin(a)*d})}
-  
-  // Clip cone
+
+  // Raycast in world space, draw in screen space
+  const rays=50,pts=[{x:W/2,y:H/2}];
+  for(let i=0;i<=rays;i++){
+    const a=myAngle-FOV+(FOV*2*i/rays);
+    const d=castRay(myX,myY,a,VIEW_DIST);
+    pts.push({x:W/2+Math.cos(a)*d,y:H/2+Math.sin(a)*d});
+  }
+
+  // Clip cone (screen space)
   ctx.save();ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
   for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
   ctx.closePath();ctx.clip();
-  
-  // Scene
+
+  // Scene inside cone
   ctx.fillStyle='#2a2a2a';ctx.fillRect(0,0,W,H);
-  drawWalls(1);
-  
+
+  // Map border (so you can see the edge)
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=2;
+  ctx.strokeRect(-camX,-camY,mapW,mapH);
+
+  // Walls in cone (screen space)
+  for(const w of gameWalls){
+    ctx.fillStyle='rgba(140,140,140,.7)';
+    ctx.fillRect(w.x-camX,w.y-camY,w.w,w.h);
+  }
+
   // Other players in cone
   for(const p of gamePlayers){
     if(p.id===myId)continue;
     if(p.caught&&!p.isSeeker)continue;
     if(isVis(myX,myY,myAngle,p.x,p.y)){
+      const sx=p.x-camX,sy=p.y-camY;
       ctx.fillStyle=characters[p.charIdx]?.color||'#888';
-      ctx.beginPath();ctx.arc(p.x,p.y,p.radius||6,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.arc(p.x,p.y,(p.radius||6)+8,0,Math.PI*2);ctx.fill();
-      // Name
-      ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px "Noto Sans KR"';ctx.textAlign='center';
-      ctx.fillText(p.name,p.x,p.y-(p.radius||6)-8);
+      ctx.beginPath();ctx.arc(sx,sy,p.radius||14,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.arc(sx,sy,(p.radius||14)+10,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='12px "Noto Sans KR"';ctx.textAlign='center';
+      ctx.fillText(p.name,sx,sy-(p.radius||14)-10);
     }
   }
   ctx.restore();
-  
+
   // Cone edge
   ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.stroke();
-  
-  // Fade
-  const grd=ctx.createRadialGradient(myX,myY,VIEW_DIST*.7,myX,myY,VIEW_DIST);
+
+  // Fade at cone edge
+  const grd=ctx.createRadialGradient(W/2,H/2,VIEW_DIST*.7,W/2,H/2,VIEW_DIST);
   grd.addColorStop(0,'rgba(0,0,0,0)');grd.addColorStop(1,'rgba(0,0,0,.7)');
   ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.fillStyle=grd;ctx.fill();
-  
-  // Walls always visible (dim)
-  drawWalls(0.15);
-  
-  // Draw me
+
+  // Dim walls always visible (screen space)
+  for(const w of gameWalls){
+    ctx.fillStyle='rgba(140,140,140,.1)';
+    ctx.fillRect(w.x-camX,w.y-camY,w.w,w.h);
+  }
+
+  // Draw me (always at screen center)
   const col=characters[me.charIdx]?.color||'#fff';
-  ctx.fillStyle=col;ctx.beginPath();ctx.arc(myX,myY,me.radius||6,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,.6)';ctx.beginPath();ctx.arc(myX+Math.cos(myAngle)*6,myY+Math.sin(myAngle)*6,3,0,Math.PI*2);ctx.fill();
-  
+  ctx.fillStyle=col;ctx.beginPath();ctx.arc(W/2,H/2,me.radius||14,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.beginPath();ctx.arc(W/2+Math.cos(myAngle)*8,H/2+Math.sin(myAngle)*8,4,0,Math.PI*2);ctx.fill();
+  // My name
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='11px "Noto Sans KR"';ctx.textAlign='center';
+  ctx.fillText(me.name,W/2,H/2-(me.radius||14)-10);
+
   // HUD
   const hud=document.getElementById('gameHudText');
   const caught=gamePlayers.filter(p=>!p.isSeeker&&p.caught).length;
   const total=gamePlayers.filter(p=>!p.isSeeker).length;
   if(isSeeker){hud.textContent='🔴 술래 | 잡은 수: '+caught+'/'+total}
   else{const meCaught=me.caught;hud.textContent='⚪ 도망자'+(meCaught?' (잡힘!)':'')}
-  
-  // Dash bar (seeker)
+
+  // Dash bar
   if(isSeeker){
     const bw=100,bh=6,bx=W/2-bw/2,by=H-20,r=1-dashCd/dashMax;
     ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(bx-1,by-1,bw+2,bh+2);
@@ -469,13 +480,6 @@ function drawGame(){
     ctx.fillStyle=r>=1?'#4ade80':'#555';ctx.fillRect(bx,by,bw*r,bh);
     ctx.fillStyle='#777';ctx.font='10px "Courier New"';ctx.textAlign='center';
     ctx.fillText(r>=1?'DASH [SPACE]':'DASH',W/2,by-4);
-  }
-}
-
-function drawWalls(a){
-  for(const w of gameWalls){
-    ctx.fillStyle=`rgba(140,140,140,${a*.7})`;
-    ctx.fillRect(w.x,w.y,w.w,w.h);
   }
 }
 
