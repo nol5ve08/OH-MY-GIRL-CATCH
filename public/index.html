@@ -161,9 +161,10 @@ const FOV=Math.PI/5, VIEW_DIST=350;
 // ═══ STATE ═══
 let ws=null, myName='', myId='', selectedChar=2, isHost=false, isReady=false;
 let currentRoomId=null, joinTarget=null;
-let gameActive=false, isSeeker=false, seekerId='', dashCd=0, dashMax=120;
+let gameActive=false, isSeeker=false, seekerId='', seekerName='';
 let gamePlayers=[], gameWalls=[], elapsed='0';
 let mapW=3000, mapH=2000;
+let startOverlayTimer=0;
 
 // ═══ UTIL ═══
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
@@ -195,7 +196,6 @@ function connect(){
         break;
       case 'game_end': gameActive=false; showToast(d.reason); showScreen('waitingScreen'); isReady=false; break;
       case 'caught': showToast('잡혔다!'); break;
-      case 'dash_cd': dashCd=d.cd; break;
       case 'error': showToast(d.msg); break;
     }
   };
@@ -335,11 +335,13 @@ function castRay(ox,oy,a,md){const s=4;let d=0;while(d<md){d+=s;const px=ox+Math
 function isVis(sx,sy,sa,px,py){const dx=px-sx,dy=py-sy,d=Math.sqrt(dx*dx+dy*dy);if(d>VIEW_DIST)return false;let ad=Math.atan2(dy,dx)-sa;while(ad>Math.PI)ad-=Math.PI*2;while(ad<-Math.PI)ad+=Math.PI*2;if(Math.abs(ad)>FOV)return false;return castRay(sx,sy,Math.atan2(dy,dx),d)>=d-5}
 
 function startGame(d){
-  myId=d.yourId;seekerId=d.seekerId;isSeeker=d.isSeeker;gamePlayers=d.players;gameWalls=d.walls;dashCd=0;gameActive=true;
+  myId=d.yourId;seekerId=d.seekerId;isSeeker=d.isSeeker;gamePlayers=d.players;gameWalls=d.walls;gameActive=true;
+  seekerName=d.seekerName||'???';
   if(d.mapW)mapW=d.mapW;if(d.mapH)mapH=d.mapH;
   const me=d.players.find(p=>p.id===myId);
   if(me){localX=me.x;localY=me.y;localAngle=me.angle}
   predictionActive=false;
+  startOverlayTimer=180; // 3 seconds at 60fps
   showScreen('gameScreen');canvas.focus();
   canvas.style.width=Math.min(900,window.innerWidth)+'px';
   canvas.style.height=Math.min(580,window.innerHeight-40)+'px';
@@ -371,12 +373,10 @@ function sendInput(){
   if(joy.left.active){angle=joy.left.angle}
   else{angle=Math.atan2(mouse.y-H/2,mouse.x-W/2)}
   
-  const dash=keys[' ']&&isSeeker&&dashCd<=0;
-  send({type:'input',moveX:mx,moveY:my,angle,dash});
-  if(dashCd>0)dashCd--;
+  send({type:'input',moveX:mx,moveY:my,angle});
 
   // Local prediction with wall collision (radius matches server)
-  const speed=me.isSeeker?5:3.5;
+  const speed=me.isSeeker?10:7;
   const r=me.isSeeker?16:14;
   const nx=localX+mx*speed;
   const ny=localY+my*speed;
@@ -469,17 +469,21 @@ function drawGame(){
   const hud=document.getElementById('gameHudText');
   const caught=gamePlayers.filter(p=>!p.isSeeker&&p.caught).length;
   const total=gamePlayers.filter(p=>!p.isSeeker).length;
-  if(isSeeker){hud.textContent='🔴 술래 | 잡은 수: '+caught+'/'+total}
-  else{const meCaught=me.caught;hud.textContent='⚪ 도망자'+(meCaught?' (잡힘!)':'')}
+  if(isSeeker){hud.textContent='🔴 술래: '+seekerName+' | 잡은 수: '+caught+'/'+total}
+  else{const meCaught=me.caught;hud.textContent='🔴 술래: '+seekerName+(meCaught?' | ⚠️ 잡힘!':'')}
 
-  // Dash bar
-  if(isSeeker){
-    const bw=100,bh=6,bx=W/2-bw/2,by=H-20,r=1-dashCd/dashMax;
-    ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(bx-1,by-1,bw+2,bh+2);
-    ctx.fillStyle='#222';ctx.fillRect(bx,by,bw,bh);
-    ctx.fillStyle=r>=1?'#4ade80':'#555';ctx.fillRect(bx,by,bw*r,bh);
-    ctx.fillStyle='#777';ctx.font='10px "Courier New"';ctx.textAlign='center';
-    ctx.fillText(r>=1?'DASH [SPACE]':'DASH',W/2,by-4);
+  // Start overlay (seeker announcement)
+  if(startOverlayTimer>0){
+    startOverlayTimer--;
+    const alpha=Math.min(1,startOverlayTimer/30);
+    ctx.fillStyle='rgba(0,0,0,'+alpha*0.7+')';
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,'+alpha+')';
+    ctx.font='bold 28px "Noto Sans KR"';ctx.textAlign='center';
+    ctx.fillText('🔴 술래: '+seekerName,W/2,H/2-10);
+    ctx.font='16px "Noto Sans KR"';
+    ctx.fillStyle='rgba(255,255,255,'+alpha*0.6+')';
+    ctx.fillText(isSeeker?'당신이 술래입니다!':'술래를 피해 도망치세요!',W/2,H/2+30);
   }
 }
 
