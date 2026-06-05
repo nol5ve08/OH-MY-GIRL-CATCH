@@ -86,7 +86,8 @@ function connect(){
         if(serverMe){
           const dx=serverMe.x-localX,dy=serverMe.y-localY;
           const diff=Math.sqrt(dx*dx+dy*dy);
-          if(diff>80){localX=serverMe.x;localY=serverMe.y;localVX=0;localVY=0}
+          if(diff>220){localX=serverMe.x;localY=serverMe.y;localVX=0;localVY=0}
+          else if(diff>10){localX+=dx*0.18;localY+=dy*0.18}
         }
         break;
       case 'game_end': gameActive=false; showToast(d.reason); showScreen('waitingScreen'); isReady=false; break;
@@ -264,7 +265,7 @@ let lastTick=0,lastFrame=0;
 function gameLoop(t){
   if(!gameActive)return;
   if(!lastFrame)lastFrame=t;
-  let dt=(t-lastFrame)/1000;if(dt>0.05)dt=0.05;lastFrame=t;
+  let dt=(t-lastFrame)/1000;if(dt>0.033)dt=0.033;lastFrame=t;
   updateLocal(dt);
   if(t-lastTick>1000/30){sendInput();lastTick=t}
   drawGame();
