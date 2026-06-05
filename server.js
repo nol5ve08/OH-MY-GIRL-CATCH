@@ -87,7 +87,7 @@ class Room {
 
   handleInput(id,data){
     const p=this.players.get(id);if(!p||this.state!=='playing')return;if(p.caught&&!p.isSeeker)return;
-    const speed=p.isSeeker?10:7;let dx=0,dy=0;
+    const speed=p.isSeeker?7.5:5.25;let dx=0,dy=0;
     if(data.moveX!==undefined){dx=data.moveX*speed;dy=data.moveY*speed}
     if(data.angle!==undefined)p.angle=data.angle;
     const steps=Math.ceil(Math.max(Math.abs(dx),Math.abs(dy)));
