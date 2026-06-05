@@ -75,7 +75,7 @@ class Room {
     let si=0;
     for(const[id,p]of this.players){p.isSeeker=(id===this.seekerId);p.caught=false;p.radius=p.isSeeker?16:14;const sp=spawns[si%spawns.length];si++;p.x=sp.x;p.y=sp.y;p.angle=0}
     this.startTime=Date.now();
-    for(const[id,p]of this.players){this.sendTo(id,{type:'game_start',yourId:id,seekerId:this.seekerId,isSeeker:p.isSeeker,players:this.getState(),walls,mapW:MAP_W,mapH:MAP_H})}
+    for(const[id,p]of this.players){const seekerP=this.players.get(this.seekerId);this.sendTo(id,{type:'game_start',yourId:id,seekerId:this.seekerId,seekerName:seekerP?seekerP.name:'???',isSeeker:p.isSeeker,players:this.getState(),walls,mapW:MAP_W,mapH:MAP_H})}
     this.gameTimer=setInterval(()=>this.tick(),1000/TICK_RATE);
   }
 
@@ -87,10 +87,8 @@ class Room {
 
   handleInput(id,data){
     const p=this.players.get(id);if(!p||this.state!=='playing')return;if(p.caught&&!p.isSeeker)return;
-    const speed=p.isSeeker?5:3.5;let dx=0,dy=0;
+    const speed=p.isSeeker?10:7;let dx=0,dy=0;
     if(data.moveX!==undefined){dx=data.moveX*speed;dy=data.moveY*speed}
-    if(data.dash&&p.isSeeker&&!p._dashCd){const ds=12;const ddx=Math.cos(p.angle)*ds,ddy=Math.sin(p.angle)*ds;for(let i=0;i<10;i++){if(canMove(p.x+ddx,p.y,p.radius))p.x+=ddx;if(canMove(p.x,p.y+ddy,p.radius))p.y+=ddy}p._dashCd=120;this.sendTo(id,{type:'dash_cd',cd:120})}
-    if(p._dashCd>0)p._dashCd--;
     if(data.angle!==undefined)p.angle=data.angle;
     const steps=Math.ceil(Math.max(Math.abs(dx),Math.abs(dy)));
     for(let i=0;i<steps;i++){const sx=dx/steps,sy=dy/steps;if(canMove(p.x+sx,p.y,p.radius))p.x+=sx;if(canMove(p.x,p.y+sy,p.radius))p.y+=sy}
