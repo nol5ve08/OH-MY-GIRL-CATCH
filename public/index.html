@@ -375,7 +375,7 @@ function updateLocal(dt){
   else{localAngle=Math.atan2(mouse.y-H/2,mouse.x-W/2)}
 
   // Speed per second (server: 30 ticks * speed)
-  const pxPerSec=(me.isSeeker?10:7)*30;
+  const pxPerSec=(me.isSeeker?7.5:5.25)*30;
   const r=me.isSeeker?16:14;
   const step=pxPerSec*dt;
   const nx=localX+mx*step;
