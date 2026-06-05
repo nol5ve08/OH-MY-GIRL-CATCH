@@ -339,7 +339,9 @@ function startGame(d){
   const me=d.players.find(p=>p.id===myId);
   if(me){localX=me.x;localY=me.y;localAngle=me.angle}
   predictionActive=false;
-  startOverlayTimer=180; // 3 seconds at 60fps
+  startOverlayTimer=180;
+  lastFrame=0;lastTick=0;
+  for(const k in interp)delete interp[k];
   showScreen('gameScreen');canvas.focus();
   canvas.style.width=Math.min(900,window.innerWidth)+'px';
   canvas.style.height=Math.min(580,window.innerHeight-40)+'px';
@@ -356,32 +358,44 @@ function canMoveLocal(x,y,r){
 
 // Client-side prediction
 let localX=0,localY=0,localAngle=0,predictionActive=false;
+const interp={}; // smooth rendered positions for other players
 
-function sendInput(){
+// Move local player every frame (smooth 60fps), time-based
+function updateLocal(dt){
   if(!gameActive)return;
   const me=gamePlayers.find(p=>p.id===myId);if(!me)return;
   if(me.caught&&!me.isSeeker)return;
-  
+
   let mx=0,my=0;
   if(joy.right.active){mx=Math.cos(joy.right.angle)*joy.right.dist;my=Math.sin(joy.right.angle)*joy.right.dist}
   else{if(keys.w||keys.arrowup)my=-1;if(keys.s||keys.arrowdown)my=1;if(keys.a||keys.arrowleft)mx=-1;if(keys.d||keys.arrowright)mx=1;if(mx&&my){mx*=.707;my*=.707}}
 
-  // Vision angle: joystick or mouse from screen center
-  let angle=localAngle;
-  if(joy.left.active){angle=joy.left.angle}
-  else{angle=Math.atan2(mouse.y-H/2,mouse.x-W/2)}
-  
-  send({type:'input',moveX:mx,moveY:my,angle});
+  // Vision angle
+  if(joy.left.active){localAngle=joy.left.angle}
+  else{localAngle=Math.atan2(mouse.y-H/2,mouse.x-W/2)}
 
-  // Local prediction with wall collision (radius matches server)
-  const speed=me.isSeeker?10:7;
+  // Speed per second (server: 30 ticks * speed)
+  const pxPerSec=(me.isSeeker?10:7)*30;
   const r=me.isSeeker?16:14;
-  const nx=localX+mx*speed;
-  const ny=localY+my*speed;
+  const step=pxPerSec*dt;
+  const nx=localX+mx*step;
+  const ny=localY+my*step;
   if(canMoveLocal(nx,localY,r))localX=nx;
   if(canMoveLocal(localX,ny,r))localY=ny;
-  localAngle=angle;
   predictionActive=true;
+}
+
+// Send input to server (30fps)
+function sendInput(){
+  if(!gameActive)return;
+  const me=gamePlayers.find(p=>p.id===myId);if(!me)return;
+  if(me.caught&&!me.isSeeker)return;
+
+  let mx=0,my=0;
+  if(joy.right.active){mx=Math.cos(joy.right.angle)*joy.right.dist;my=Math.sin(joy.right.angle)*joy.right.dist}
+  else{if(keys.w||keys.arrowup)my=-1;if(keys.s||keys.arrowdown)my=1;if(keys.a||keys.arrowleft)mx=-1;if(keys.d||keys.arrowright)mx=1;if(mx&&my){mx*=.707;my*=.707}}
+
+  send({type:'input',moveX:mx,moveY:my,angle:localAngle});
 }
 
 function drawGame(){
@@ -425,12 +439,17 @@ function drawGame(){
     ctx.fillRect(w.x-camX,w.y-camY,w.w,w.h);
   }
 
-  // Other players in cone
+  // Other players in cone (interpolated positions)
   for(const p of gamePlayers){
     if(p.id===myId)continue;
     if(p.caught&&!p.isSeeker)continue;
-    if(isVis(myX,myY,myAngle,p.x,p.y)){
-      const sx=p.x-camX,sy=p.y-camY;
+    // Interpolate rendered position toward server position
+    if(!interp[p.id])interp[p.id]={x:p.x,y:p.y};
+    interp[p.id].x+=(p.x-interp[p.id].x)*0.25;
+    interp[p.id].y+=(p.y-interp[p.id].y)*0.25;
+    const px=interp[p.id].x,py=interp[p.id].y;
+    if(isVis(myX,myY,myAngle,px,py)){
+      const sx=px-camX,sy=py-camY;
       ctx.fillStyle=characters[p.charIdx]?.color||'#888';
       ctx.beginPath();ctx.arc(sx,sy,p.radius||14,0,Math.PI*2);ctx.fill();
       ctx.fillStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.arc(sx,sy,(p.radius||14)+10,0,Math.PI*2);ctx.fill();
@@ -485,10 +504,16 @@ function drawGame(){
   }
 }
 
-let lastTick=0;
+let lastTick=0,lastFrame=0;
 function gameLoop(t){
   if(!gameActive)return;
-  if(t-lastTick>1000/30){sendInput();lastTick=t}
+  if(!lastFrame)lastFrame=t;
+  let dt=(t-lastFrame)/1000;
+  if(dt>0.05)dt=0.05; // cap to avoid jumps
+  lastFrame=t;
+
+  updateLocal(dt);           // smooth movement every frame
+  if(t-lastTick>1000/30){sendInput();lastTick=t}  // network send 30fps
   drawGame();
   requestAnimationFrame(gameLoop);
 }
