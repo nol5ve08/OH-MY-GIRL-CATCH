@@ -329,7 +329,7 @@ function setupJoy(id,knobId,key){
 setupJoy('joyLeft','knobLeft','left');setupJoy('joyRight','knobRight','right');
 
 // Raycasting
-function castRay(ox,oy,a,md){const s=4;let d=0;while(d<md){d+=s;const px=ox+Math.cos(a)*d,py=oy+Math.sin(a)*d;if(px<0||px>mapW||py<0||py>mapH)return d;for(const w of gameWalls)if(px>=w.x&&px<=w.x+w.w&&py>=w.y&&py<=w.y+w.h)return d}return md}
+function castRay(ox,oy,a,md){const s=8,cosA=Math.cos(a),sinA=Math.sin(a);let d=0;while(d<md){d+=s;const px=ox+cosA*d,py=oy+sinA*d;if(px<0||px>mapW||py<0||py>mapH)return d;for(let i=0;i<gameWalls.length;i++){const w=gameWalls[i];if(px>=w.x&&px<=w.x+w.w&&py>=w.y&&py<=w.y+w.h)return d}}return md}
 function isVis(sx,sy,sa,px,py){const dx=px-sx,dy=py-sy,d=Math.sqrt(dx*dx+dy*dy);if(d>VIEW_DIST)return false;let ad=Math.atan2(dy,dx)-sa;while(ad>Math.PI)ad-=Math.PI*2;while(ad<-Math.PI)ad+=Math.PI*2;if(Math.abs(ad)>FOV)return false;return castRay(sx,sy,Math.atan2(dy,dx),d)>=d-5}
 
 function startGame(d){
@@ -414,7 +414,7 @@ function drawGame(){
   ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
 
   // Raycast in world space, draw in screen space
-  const rays=50,pts=[{x:W/2,y:H/2}];
+  const rays=32,pts=[{x:W/2,y:H/2}];
   for(let i=0;i<=rays;i++){
     const a=myAngle-FOV+(FOV*2*i/rays);
     const d=castRay(myX,myY,a,VIEW_DIST);
@@ -433,11 +433,9 @@ function drawGame(){
   ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=2;
   ctx.strokeRect(-camX,-camY,mapW,mapH);
 
-  // Walls in cone (screen space)
-  for(const w of gameWalls){
-    ctx.fillStyle='rgba(140,140,140,.7)';
-    ctx.fillRect(w.x-camX,w.y-camY,w.w,w.h);
-  }
+  // Walls in cone (screen space, only visible ones)
+  ctx.fillStyle='rgba(140,140,140,.7)';
+  for(let i=0;i<gameWalls.length;i++){const w=gameWalls[i];const sx=w.x-camX,sy=w.y-camY;if(sx+w.w<0||sx>W||sy+w.h<0||sy>H)continue;ctx.fillRect(sx,sy,w.w,w.h)}
 
   // Other players in cone (interpolated positions)
   for(const p of gamePlayers){
@@ -468,11 +466,9 @@ function drawGame(){
   grd.addColorStop(0,'rgba(0,0,0,0)');grd.addColorStop(1,'rgba(0,0,0,.7)');
   ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.fillStyle=grd;ctx.fill();
 
-  // Dim walls always visible (screen space)
-  for(const w of gameWalls){
-    ctx.fillStyle='rgba(140,140,140,.1)';
-    ctx.fillRect(w.x-camX,w.y-camY,w.w,w.h);
-  }
+  // Dim walls always visible (screen space, only visible ones)
+  ctx.fillStyle='rgba(140,140,140,.1)';
+  for(let i=0;i<gameWalls.length;i++){const w=gameWalls[i];const sx=w.x-camX,sy=w.y-camY;if(sx+w.w<0||sx>W||sy+w.h<0||sy>H)continue;ctx.fillRect(sx,sy,w.w,w.h)}
 
   // Draw me (always at screen center)
   const col=characters[me.charIdx]?.color||'#fff';
