@@ -14,7 +14,6 @@ const TICK_RATE = 30;
 const MAP_W = 3000, MAP_H = 2000;
 
 const walls = [
-  // Big blocks
   {x:400,y:200,w:200,h:120},{x:900,y:100,w:180,h:100},{x:1500,y:300,w:220,h:140},
   {x:2200,y:200,w:180,h:120},{x:2600,y:500,w:160,h:100},
   {x:300,y:800,w:200,h:100},{x:800,y:700,w:160,h:120},{x:1400,y:700,w:200,h:100},
@@ -23,7 +22,6 @@ const walls = [
   {x:2300,y:1200,w:200,h:100},{x:100,y:1600,w:180,h:120},
   {x:700,y:1700,w:200,h:100},{x:1300,y:1600,w:180,h:120},{x:1900,y:1700,w:200,h:100},
   {x:2600,y:1600,w:160,h:120},
-  // L-shaped walls
   {x:200,y:400,w:8,h:120},{x:200,y:516,w:100,h:8},
   {x:700,y:400,w:100,h:8},{x:700,y:400,w:8,h:100},
   {x:1200,y:500,w:8,h:140},{x:1200,y:636,w:120,h:8},
@@ -38,12 +36,10 @@ const walls = [
   {x:1000,y:1500,w:120,h:8},{x:1000,y:1500,w:8,h:100},
   {x:1600,y:1500,w:8,h:120},{x:1600,y:1616,w:100,h:8},
   {x:2200,y:1500,w:100,h:8},{x:2296,y:1500,w:8,h:100},
-  // Horizontal barriers
   {x:550,y:600,w:150,h:8},{x:1050,y:900,w:180,h:8},
   {x:1800,y:600,w:160,h:8},{x:2400,y:750,w:140,h:8},
   {x:200,y:1200,w:160,h:8},{x:850,y:1400,w:140,h:8},
   {x:2000,y:1400,w:160,h:8},{x:2500,y:1300,w:140,h:8},
-  // Vertical barriers
   {x:600,y:150,w:8,h:120},{x:1100,y:350,w:8,h:100},
   {x:2000,y:150,w:8,h:120},{x:2800,y:300,w:8,h:140},
   {x:150,y:950,w:8,h:100},{x:1500,y:950,w:8,h:120},
@@ -65,7 +61,7 @@ function canMove(x,y,r){if(x-r<0||x+r>MAP_W||y-r<0||y+r>MAP_H)return false;for(c
 class Room {
   constructor(id,title,password,hostId){this.id=id;this.title=title;this.password=password||null;this.hostId=hostId;this.players=new Map();this.state='waiting';this.seekerId=null;this.gameTimer=null;this.startTime=0}
 
-  addPlayer(ws,name,charIdx){const id=ws._pid;this.players.set(id,{id,ws,name,charIdx,ready:false,x:0,y:0,angle:0,isSeeker:false,caught:false,radius:14});ws._roomId=this.id;this.broadcastLobby()}
+  addPlayer(ws,name,charIdx){const id=ws._pid;this.players.set(id,{id,ws,name,charIdx,ready:false,x:0,y:0,vx:0,vy:0,inputX:0,inputY:0,angle:0,isSeeker:false,caught:false,radius:14});ws._roomId=this.id;this.broadcastLobby()}
 
   removePlayer(id){this.players.delete(id);if(this.players.size===0){this.cleanup();rooms.delete(this.id);return}if(this.hostId===id)this.hostId=this.players.keys().next().value;if(this.state==='playing'){if(this.seekerId===id)this.endGame('술래가 나갔습니다');else this.checkWin()}this.broadcastLobby()}
 
@@ -73,25 +69,39 @@ class Room {
     if(this.players.size<2)return;this.state='playing';
     const ids=[...this.players.keys()];this.seekerId=ids[Math.floor(Math.random()*ids.length)];
     let si=0;
-    for(const[id,p]of this.players){p.isSeeker=(id===this.seekerId);p.caught=false;p.radius=p.isSeeker?16:14;const sp=spawns[si%spawns.length];si++;p.x=sp.x;p.y=sp.y;p.angle=0}
+    for(const[id,p]of this.players){p.isSeeker=(id===this.seekerId);p.caught=false;p.radius=p.isSeeker?16:14;p.vx=0;p.vy=0;p.inputX=0;p.inputY=0;const sp=spawns[si%spawns.length];si++;p.x=sp.x;p.y=sp.y;p.angle=0}
     this.startTime=Date.now();
     for(const[id,p]of this.players){const seekerP=this.players.get(this.seekerId);this.sendTo(id,{type:'game_start',yourId:id,seekerId:this.seekerId,seekerName:seekerP?seekerP.name:'???',isSeeker:p.isSeeker,players:this.getState(),walls,mapW:MAP_W,mapH:MAP_H})}
     this.gameTimer=setInterval(()=>this.tick(),1000/TICK_RATE);
   }
 
   tick(){
-    if(this.state!=='playing')return;const seeker=this.players.get(this.seekerId);if(!seeker)return;
+    if(this.state!=='playing')return;this.updateMovement();const seeker=this.players.get(this.seekerId);if(!seeker)return;
     for(const[id,p]of this.players){if(id===this.seekerId||p.caught)continue;const dx=seeker.x-p.x,dy=seeker.y-p.y;if(Math.sqrt(dx*dx+dy*dy)<CATCH_DIST){p.caught=true;this.broadcast({type:'caught',playerId:id});this.checkWin()}}
     this.broadcast({type:'sync',players:this.getState(),elapsed:((Date.now()-this.startTime)/1000).toFixed(1)});
   }
 
-  handleInput(id,data){
-    const p=this.players.get(id);if(!p||this.state!=='playing')return;if(p.caught&&!p.isSeeker)return;
-    const speed=p.isSeeker?7.5:5.25;let dx=0,dy=0;
-    if(data.moveX!==undefined){dx=data.moveX*speed;dy=data.moveY*speed}
-    if(data.angle!==undefined)p.angle=data.angle;
+  updateMovement(){
+    for(const[,p]of this.players){
+      if(p.caught&&!p.isSeeker){p.vx=0;p.vy=0;continue}
+      const speed=p.isSeeker?7.5:5.25;
+      const targetX=(p.inputX||0)*speed,targetY=(p.inputY||0)*speed;
+      p.vx+=(targetX-p.vx)*0.55;
+      p.vy+=(targetY-p.vy)*0.55;
+      if(Math.abs(p.vx)<0.01)p.vx=0;if(Math.abs(p.vy)<0.01)p.vy=0;
+      this.movePlayer(p,p.vx,p.vy);
+    }
+  }
+
+  movePlayer(p,dx,dy){
     const steps=Math.ceil(Math.max(Math.abs(dx),Math.abs(dy)));
     for(let i=0;i<steps;i++){const sx=dx/steps,sy=dy/steps;if(canMove(p.x+sx,p.y,p.radius))p.x+=sx;if(canMove(p.x,p.y+sy,p.radius))p.y+=sy}
+  }
+
+  handleInput(id,data){
+    const p=this.players.get(id);if(!p||this.state!=='playing')return;if(p.caught&&!p.isSeeker)return;
+    if(data.moveX!==undefined){p.inputX=Number(data.moveX)||0;p.inputY=Number(data.moveY)||0}
+    if(data.angle!==undefined)p.angle=data.angle;
   }
 
   checkWin(){if([...this.players.values()].filter(p=>!p.isSeeker).every(p=>p.caught))this.endGame('술래 승리! '+((Date.now()-this.startTime)/1000).toFixed(1)+'초')}
